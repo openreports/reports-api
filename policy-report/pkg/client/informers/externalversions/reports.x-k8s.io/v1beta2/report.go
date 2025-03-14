@@ -31,58 +31,59 @@ import (
 	v1beta2 "sigs.k8s.io/wg-policy-prototypes/policy-report/pkg/client/listers/reports.x-k8s.io/v1beta2"
 )
 
-// ClusterPolicyReportInformer provides access to a shared informer and lister for
-// ClusterPolicyReports.
-type ClusterPolicyReportInformer interface {
+// ReportInformer provides access to a shared informer and lister for
+// Reports.
+type ReportInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1beta2.ClusterPolicyReportLister
+	Lister() v1beta2.ReportLister
 }
 
-type clusterPolicyReportInformer struct {
+type reportInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	namespace        string
 }
 
-// NewClusterPolicyReportInformer constructs a new informer for ClusterPolicyReport type.
+// NewReportInformer constructs a new informer for Report type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewClusterPolicyReportInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredClusterPolicyReportInformer(client, resyncPeriod, indexers, nil)
+func NewReportInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredReportInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredClusterPolicyReportInformer constructs a new informer for ClusterPolicyReport type.
+// NewFilteredReportInformer constructs a new informer for Report type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredClusterPolicyReportInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredReportInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ReportsV1beta2().ClusterPolicyReports().List(context.TODO(), options)
+				return client.ReportsV1beta2().Reports(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ReportsV1beta2().ClusterPolicyReports().Watch(context.TODO(), options)
+				return client.ReportsV1beta2().Reports(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&reportsxk8siov1beta2.ClusterPolicyReport{},
+		&reportsxk8siov1beta2.Report{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *clusterPolicyReportInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredClusterPolicyReportInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *reportInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredReportInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *clusterPolicyReportInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&reportsxk8siov1beta2.ClusterPolicyReport{}, f.defaultInformer)
+func (f *reportInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&reportsxk8siov1beta2.Report{}, f.defaultInformer)
 }
 
-func (f *clusterPolicyReportInformer) Lister() v1beta2.ClusterPolicyReportLister {
-	return v1beta2.NewClusterPolicyReportLister(f.Informer().GetIndexer())
+func (f *reportInformer) Lister() v1beta2.ReportLister {
+	return v1beta2.NewReportLister(f.Informer().GetIndexer())
 }

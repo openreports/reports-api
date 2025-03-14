@@ -17,14 +17,14 @@ limitations under the License.
 
 package v1beta2
 
-// ClusterPolicyReportListerExpansion allows custom methods to be added to
-// ClusterPolicyReportLister.
-type ClusterPolicyReportListerExpansion interface{}
+// ClusterReportListerExpansion allows custom methods to be added to
+// ClusterReportLister.
+type ClusterReportListerExpansion interface{}
 
-// PolicyReportListerExpansion allows custom methods to be added to
-// PolicyReportLister.
-type PolicyReportListerExpansion interface{}
+// ReportListerExpansion allows custom methods to be added to
+// ReportLister.
+type ReportListerExpansion interface{}
 
-// PolicyReportNamespaceListerExpansion allows custom methods to be added to
-// PolicyReportNamespaceLister.
-type PolicyReportNamespaceListerExpansion interface{}
+// ReportNamespaceListerExpansion allows custom methods to be added to
+// ReportNamespaceLister.
+type ReportNamespaceListerExpansion interface{}

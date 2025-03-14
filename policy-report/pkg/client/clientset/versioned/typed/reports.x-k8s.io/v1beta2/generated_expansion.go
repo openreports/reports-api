@@ -17,6 +17,6 @@ limitations under the License.
 
 package v1beta2
 
-type ClusterPolicyReportExpansion interface{}
+type ClusterReportExpansion interface{}
 
-type PolicyReportExpansion interface{}
+type ReportExpansion interface{}

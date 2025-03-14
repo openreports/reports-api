@@ -11,42 +11,42 @@ Package v1beta2 contains API Schema definitions for the policy v1beta2 API group
 Package v1beta2 contains API Schema definitions for the policy v1beta2 API group
 
 ### Resource Types
-- [ClusterPolicyReport](#clusterpolicyreport)
-- [ClusterPolicyReportList](#clusterpolicyreportlist)
-- [PolicyReport](#policyreport)
-- [PolicyReportList](#policyreportlist)
+- [ClusterReport](#clusterreport)
+- [ClusterReportList](#clusterreportlist)
+- [Report](#report)
+- [ReportList](#reportlist)
 
 
 
-#### ClusterPolicyReport
+#### ClusterReport
 
 
 
-ClusterPolicyReport is the Schema for the clusterpolicyreports API
+ClusterReport is the Schema for the clusterpolicyreports API
 
 
 
 _Appears in:_
-- [ClusterPolicyReportList](#clusterpolicyreportlist)
+- [ClusterReportList](#clusterreportlist)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `apiVersion` _string_ | `reports.x-k8s.io/v1beta2` | | |
-| `kind` _string_ | `ClusterPolicyReport` | | |
+| `kind` _string_ | `ClusterReport` | | |
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
-| `source` _string_ | Source is an identifier for the source e.g. a policy engine that manages this report.<br />Use this field if all the results are produced by a single policy engine.<br />If the results are produced by multiple sources e.g. different engines or scanners,<br />then use the Source field at the PolicyReportResult level. |  |  |
+| `source` _string_ | Source is an identifier for the source e.g. a policy engine that manages this report.<br />Use this field if all the results are produced by a single policy engine.<br />If the results are produced by multiple sources e.g. different engines or scanners,<br />then use the Source field at the ReportResult level. |  |  |
 | `scope` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#objectreference-v1-core)_ | Scope is an optional reference to the report scope (e.g. a Deployment, Namespace, or Node) |  |  |
 | `scopeSelector` _[LabelSelector](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#labelselector-v1-meta)_ | ScopeSelector is an optional selector for multiple scopes (e.g. Pods).<br />Either one of, or none of, but not both of, Scope or ScopeSelector should be specified. |  |  |
-| `configuration` _[PolicyReportConfiguration](#policyreportconfiguration)_ | Configuration is an optional field which can be used to specify<br />a contract between PolicyReport generators and consumers |  |  |
-| `summary` _[PolicyReportSummary](#policyreportsummary)_ | PolicyReportSummary provides a summary of results |  |  |
-| `results` _[PolicyReportResult](#policyreportresult) array_ | PolicyReportResult provides result details |  |  |
+| `configuration` _[ReportConfiguration](#reportconfiguration)_ | Configuration is an optional field which can be used to specify<br />a contract between Report generators and consumers |  |  |
+| `summary` _[ReportSummary](#reportsummary)_ | ReportSummary provides a summary of results |  |  |
+| `results` _[ReportResult](#reportresult) array_ | ReportResult provides result details |  |  |
 
 
-#### ClusterPolicyReportList
+#### ClusterReportList
 
 
 
-ClusterPolicyReportList contains a list of ClusterPolicyReport
+ClusterReportList contains a list of ClusterReport
 
 
 
@@ -55,9 +55,9 @@ ClusterPolicyReportList contains a list of ClusterPolicyReport
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `apiVersion` _string_ | `reports.x-k8s.io/v1beta2` | | |
-| `kind` _string_ | `ClusterPolicyReportList` | | |
+| `kind` _string_ | `ClusterReportList` | | |
 | `metadata` _[ListMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#listmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
-| `items` _[ClusterPolicyReport](#clusterpolicyreport) array_ |  |  |  |
+| `items` _[ClusterReport](#clusterreport) array_ |  |  |  |
 
 
 #### Limits
@@ -69,39 +69,39 @@ ClusterPolicyReportList contains a list of ClusterPolicyReport
 
 
 _Appears in:_
-- [PolicyReportConfiguration](#policyreportconfiguration)
+- [ReportConfiguration](#reportconfiguration)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `maxResults` _integer_ | MaxResults is the maximum number of results contained in the report |  |  |
-| `statusFilter` _[StatusFilter](#statusfilter) array_ | StatusFilter indicates that the PolicyReport contains only those reports with statuses specified in this list |  | Enum: [pass fail warn error skip] <br /> |
+| `statusFilter` _[StatusFilter](#statusfilter) array_ | StatusFilter indicates that the Report contains only those reports with statuses specified in this list |  | Enum: [pass fail warn error skip] <br /> |
 
 
-#### PolicyReport
+#### Report
 
 
 
-PolicyReport is the Schema for the policyreports API
+Report is the Schema for the reports API
 
 
 
 _Appears in:_
-- [PolicyReportList](#policyreportlist)
+- [ReportList](#reportlist)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `apiVersion` _string_ | `reports.x-k8s.io/v1beta2` | | |
-| `kind` _string_ | `PolicyReport` | | |
+| `kind` _string_ | `Report` | | |
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
-| `source` _string_ | Source is an identifier for the source e.g. a policy engine that manages this report.<br />Use this field if all the results are produced by a single policy engine.<br />If the results are produced by multiple sources e.g. different engines or scanners,<br />then use the Source field at the PolicyReportResult level. |  |  |
+| `source` _string_ | Source is an identifier for the source e.g. a policy engine that manages this report.<br />Use this field if all the results are produced by a single policy engine.<br />If the results are produced by multiple sources e.g. different engines or scanners,<br />then use the Source field at the ReportResult level. |  |  |
 | `scope` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#objectreference-v1-core)_ | Scope is an optional reference to the report scope (e.g. a Deployment, Namespace, or Node) |  |  |
 | `scopeSelector` _[LabelSelector](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#labelselector-v1-meta)_ | ScopeSelector is an optional selector for multiple scopes (e.g. Pods).<br />Either one of, or none of, but not both of, Scope or ScopeSelector should be specified. |  |  |
-| `configuration` _[PolicyReportConfiguration](#policyreportconfiguration)_ | Configuration is an optional field which can be used to specify<br />a contract between PolicyReport generators and consumers |  |  |
-| `summary` _[PolicyReportSummary](#policyreportsummary)_ | PolicyReportSummary provides a summary of results |  |  |
-| `results` _[PolicyReportResult](#policyreportresult) array_ | PolicyReportResult provides result details |  |  |
+| `configuration` _[ReportConfiguration](#reportconfiguration)_ | Configuration is an optional field which can be used to specify<br />a contract between Report generators and consumers |  |  |
+| `summary` _[ReportSummary](#reportsummary)_ | ReportSummary provides a summary of results |  |  |
+| `results` _[ReportResult](#reportresult) array_ | ReportResult provides result details |  |  |
 
 
-#### PolicyReportConfiguration
+#### ReportConfiguration
 
 
 
@@ -110,19 +110,19 @@ _Appears in:_
 
 
 _Appears in:_
-- [ClusterPolicyReport](#clusterpolicyreport)
-- [PolicyReport](#policyreport)
+- [ClusterReport](#clusterreport)
+- [Report](#report)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `limits` _[Limits](#limits)_ |  |  |  |
 
 
-#### PolicyReportList
+#### ReportList
 
 
 
-PolicyReportList contains a list of PolicyReport
+ReportList contains a list of Report
 
 
 
@@ -131,32 +131,32 @@ PolicyReportList contains a list of PolicyReport
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `apiVersion` _string_ | `reports.x-k8s.io/v1beta2` | | |
-| `kind` _string_ | `PolicyReportList` | | |
+| `kind` _string_ | `ReportList` | | |
 | `metadata` _[ListMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#listmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
-| `items` _[PolicyReport](#policyreport) array_ |  |  |  |
+| `items` _[Report](#report) array_ |  |  |  |
 
 
-#### PolicyReportResult
+#### ReportResult
 
 
 
-PolicyReportResult provides the result for an individual policy
+ReportResult provides the result for an individual policy
 
 
 
 _Appears in:_
-- [ClusterPolicyReport](#clusterpolicyreport)
-- [PolicyReport](#policyreport)
+- [ClusterReport](#clusterreport)
+- [Report](#report)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `source` _string_ | Source is an identifier for the policy engine that manages this report<br />If the Source is specified at this level, it will override the Source<br />field set at the PolicyReport level |  |  |
+| `source` _string_ | Source is an identifier for the policy engine that manages this report<br />If the Source is specified at this level, it will override the Source<br />field set at the Report level |  |  |
 | `policy` _string_ | Policy is the name or identifier of the policy |  |  |
 | `rule` _string_ | Rule is the name or identifier of the rule within the policy |  |  |
 | `category` _string_ | Category indicates policy category |  |  |
-| `severity` _[PolicyResultSeverity](#policyresultseverity)_ | Severity indicates policy check result criticality |  | Enum: [critical high low medium info] <br /> |
+| `severity` _[ResultSeverity](#resultseverity)_ | Severity indicates policy check result criticality |  | Enum: [critical high low medium info] <br /> |
 | `timestamp` _[Timestamp](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#timestamp-v1-meta)_ | Timestamp indicates the time the result was found |  |  |
-| `result` _[PolicyResult](#policyresult)_ | Result indicates the outcome of the policy rule execution |  | Enum: [pass fail warn error skip] <br /> |
+| `result` _[Result](#result)_ | Result indicates the outcome of the policy rule execution |  | Enum: [pass fail warn error skip] <br /> |
 | `scored` _boolean_ | Scored indicates if this result is scored |  |  |
 | `resources` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#objectreference-v1-core) array_ | Subjects is an optional reference to the checked Kubernetes resources |  |  |
 | `resourceSelector` _[LabelSelector](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#labelselector-v1-meta)_ | ResourceSelector is an optional label selector for checked Kubernetes resources.<br />For example, a policy result may apply to all pods that match a label.<br />Either a Subject or a ResourceSelector can be specified. If neither are provided, the<br />result is assumed to be for the policy report scope. |  |  |
@@ -164,17 +164,17 @@ _Appears in:_
 | `properties` _object (keys:string, values:string)_ | Properties provides additional information for the policy rule |  |  |
 
 
-#### PolicyReportSummary
+#### ReportSummary
 
 
 
-PolicyReportSummary provides a status count summary
+ReportSummary provides a status count summary
 
 
 
 _Appears in:_
-- [ClusterPolicyReport](#clusterpolicyreport)
-- [PolicyReport](#policyreport)
+- [ClusterReport](#clusterreport)
+- [Report](#report)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -185,11 +185,11 @@ _Appears in:_
 | `skip` _integer_ | Skip indicates the count of policies that were not selected for evaluation |  |  |
 
 
-#### PolicyResult
+#### Result
 
 _Underlying type:_ _string_
 
-PolicyResult has one of the following values:
+Result has one of the following values:
   - pass: the policy requirements are met
   - fail: the policy requirements are not met
   - warn: the policy requirements are not met and the policy is not scored
@@ -200,15 +200,15 @@ _Validation:_
 - Enum: [pass fail warn error skip]
 
 _Appears in:_
-- [PolicyReportResult](#policyreportresult)
+- [ReportResult](#reportresult)
 
 
 
-#### PolicyResultSeverity
+#### ResultSeverity
 
 _Underlying type:_ _string_
 
-PolicyResultSeverity has one of the following values:
+ResultSeverity has one of the following values:
   - critical
   - high
   - low
@@ -219,7 +219,7 @@ _Validation:_
 - Enum: [critical high low medium info]
 
 _Appears in:_
-- [PolicyReportResult](#policyreportresult)
+- [ReportResult](#reportresult)
 
 
 
@@ -227,7 +227,7 @@ _Appears in:_
 
 _Underlying type:_ _string_
 
-StatusFilter is used by PolicyReport generators to write only those reports whose status is specified by the filters
+StatusFilter is used by Report generators to write only those reports whose status is specified by the filters
 
 _Validation:_
 - Enum: [pass fail warn error skip]

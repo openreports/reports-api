@@ -4,17 +4,17 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.14.0
-  name: policyreports.reports.x-k8s.io
+  name: clusterreports.reports.x-k8s.io
 spec:
   group: reports.x-k8s.io
   names:
-    kind: PolicyReport
-    listKind: PolicyReportList
-    plural: policyreports
+    kind: ClusterReport
+    listKind: ClusterReportList
+    plural: clusterreports
     shortNames:
-    - polr
-    singular: policyreport
-  scope: Namespaced
+    - creps
+    singular: clusterreport
+  scope: Cluster
   versions:
   - additionalPrinterColumns:
     - jsonPath: .scope.kind
@@ -46,7 +46,7 @@ spec:
     name: v1beta2
     schema:
       openAPIV3Schema:
-        description: PolicyReport is the Schema for the policyreports API
+        description: ClusterReport is the Schema for the clusterpolicyreports API
         properties:
           apiVersion:
             description: |-
@@ -58,7 +58,7 @@ spec:
           configuration:
             description: |-
               Configuration is an optional field which can be used to specify
-              a contract between PolicyReport generators and consumers
+              a contract between Report generators and consumers
             properties:
               limits:
                 properties:
@@ -67,12 +67,11 @@ spec:
                       in the report
                     type: integer
                   statusFilter:
-                    description: StatusFilter indicates that the PolicyReport contains
-                      only those reports with statuses specified in this list
+                    description: StatusFilter indicates that the Report contains only
+                      those reports with statuses specified in this list
                     items:
-                      description: StatusFilter is used by PolicyReport generators
-                        to write only those reports whose status is specified by the
-                        filters
+                      description: StatusFilter is used by Report generators to write
+                        only those reports whose status is specified by the filters
                       enum:
                       - pass
                       - fail
@@ -96,10 +95,9 @@ spec:
           metadata:
             type: object
           results:
-            description: PolicyReportResult provides result details
+            description: ReportResult provides result details
             items:
-              description: PolicyReportResult provides the result for an individual
-                policy
+              description: ReportResult provides the result for an individual policy
               properties:
                 category:
                   description: Category indicates policy category
@@ -261,7 +259,7 @@ spec:
                   description: |-
                     Source is an identifier for the policy engine that manages this report
                     If the Source is specified at this level, it will override the Source
-                    field set at the PolicyReport level
+                    field set at the Report level
                   type: string
                 timestamp:
                   description: Timestamp indicates the time the result was found
@@ -387,10 +385,10 @@ spec:
               Source is an identifier for the source e.g. a policy engine that manages this report.
               Use this field if all the results are produced by a single policy engine.
               If the results are produced by multiple sources e.g. different engines or scanners,
-              then use the Source field at the PolicyReportResult level.
+              then use the Source field at the ReportResult level.
             type: string
           summary:
-            description: PolicyReportSummary provides a summary of results
+            description: ReportSummary provides a summary of results
             properties:
               error:
                 description: Error provides the count of policies that could not be

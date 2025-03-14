@@ -29,7 +29,7 @@ import (
 // +genclient:nonNamespaced
 // +kubebuilder:storageversion
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:path=clusterpolicyreports,scope="Cluster",shortName=cpolr
+// +kubebuilder:resource:path=clusterreports,scope="Cluster",shortName=creps
 // +kubebuilder:printcolumn:name="Kind",type=string,JSONPath=`.scope.kind`,priority=1
 // +kubebuilder:printcolumn:name="Name",type=string,JSONPath=`.scope.name`,priority=1
 // +kubebuilder:printcolumn:name="Pass",type=integer,JSONPath=`.summary.pass`
@@ -39,15 +39,15 @@ import (
 // +kubebuilder:printcolumn:name="Skip",type=integer,JSONPath=`.summary.skip`
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 
-// ClusterPolicyReport is the Schema for the clusterpolicyreports API
-type ClusterPolicyReport struct {
+// ClusterReport is the Schema for the clusterpolicyreports API
+type ClusterReport struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Source is an identifier for the source e.g. a policy engine that manages this report.
 	// Use this field if all the results are produced by a single policy engine.
 	// If the results are produced by multiple sources e.g. different engines or scanners,
-	// then use the Source field at the PolicyReportResult level.
+	// then use the Source field at the ReportResult level.
 	// +optional
 	Source string `json:"source"`
 
@@ -61,28 +61,28 @@ type ClusterPolicyReport struct {
 	ScopeSelector *metav1.LabelSelector `json:"scopeSelector,omitempty"`
 
 	// Configuration is an optional field which can be used to specify
-	// a contract between PolicyReport generators and consumers
+	// a contract between Report generators and consumers
 	// +optional
-	Configuration *PolicyReportConfiguration `json:"configuration,omitempty"`
+	Configuration *ReportConfiguration `json:"configuration,omitempty"`
 
-	// PolicyReportSummary provides a summary of results
+	// ReportSummary provides a summary of results
 	// +optional
-	Summary PolicyReportSummary `json:"summary,omitempty"`
+	Summary ReportSummary `json:"summary,omitempty"`
 
-	// PolicyReportResult provides result details
+	// ReportResult provides result details
 	// +optional
-	Results []PolicyReportResult `json:"results,omitempty"`
+	Results []ReportResult `json:"results,omitempty"`
 }
 
-// ClusterPolicyReportList contains a list of ClusterPolicyReport
+// ClusterReportList contains a list of ClusterReport
 // +kubebuilder:object:root=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-type ClusterPolicyReportList struct {
+type ClusterReportList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ClusterPolicyReport `json:"items"`
+	Items           []ClusterReport `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&ClusterPolicyReport{}, &ClusterPolicyReportList{})
+	SchemeBuilder.Register(&ClusterReport{}, &ClusterReportList{})
 }

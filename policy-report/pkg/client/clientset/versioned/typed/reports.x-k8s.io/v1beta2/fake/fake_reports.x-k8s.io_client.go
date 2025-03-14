@@ -27,12 +27,12 @@ type FakeReportsV1beta2 struct {
 	*testing.Fake
 }
 
-func (c *FakeReportsV1beta2) ClusterPolicyReports() v1beta2.ClusterPolicyReportInterface {
-	return &FakeClusterPolicyReports{c}
+func (c *FakeReportsV1beta2) ClusterReports() v1beta2.ClusterReportInterface {
+	return &FakeClusterReports{c}
 }
 
-func (c *FakeReportsV1beta2) PolicyReports(namespace string) v1beta2.PolicyReportInterface {
-	return &FakePolicyReports{c, namespace}
+func (c *FakeReportsV1beta2) Reports(namespace string) v1beta2.ReportInterface {
+	return &FakeReports{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

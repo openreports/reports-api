@@ -21,7 +21,7 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// StatusFilter is used by PolicyReport generators to write only those reports whose status is specified by the filters
+// StatusFilter is used by Report generators to write only those reports whose status is specified by the filters
 // +kubebuilder:validation:Enum=pass;fail;warn;error;skip
 type StatusFilter string
 
@@ -30,17 +30,17 @@ type Limits struct {
 	// +optional
 	MaxResults int `json:"maxResults"`
 
-	// StatusFilter indicates that the PolicyReport contains only those reports with statuses specified in this list
+	// StatusFilter indicates that the Report contains only those reports with statuses specified in this list
 	// +optional
 	StatusFilter []StatusFilter `json:"statusFilter,omitempty"`
 }
 
-type PolicyReportConfiguration struct {
+type ReportConfiguration struct {
 	Limits Limits `json:"limits"`
 }
 
-// PolicyReportSummary provides a status count summary
-type PolicyReportSummary struct {
+// ReportSummary provides a status count summary
+type ReportSummary struct {
 
 	// Pass provides the count of policies whose requirements were met
 	// +optional
@@ -63,7 +63,7 @@ type PolicyReportSummary struct {
 	Skip int `json:"skip"`
 }
 
-// PolicyResult has one of the following values:
+// Result has one of the following values:
 //   - pass: the policy requirements are met
 //   - fail: the policy requirements are not met
 //   - warn: the policy requirements are not met and the policy is not scored
@@ -71,9 +71,9 @@ type PolicyReportSummary struct {
 //   - skip: the policy was not selected based on user inputs or applicability
 //
 // +kubebuilder:validation:Enum=pass;fail;warn;error;skip
-type PolicyResult string
+type Result string
 
-// PolicyResultSeverity has one of the following values:
+// ResultSeverity has one of the following values:
 //   - critical
 //   - high
 //   - low
@@ -81,14 +81,14 @@ type PolicyResult string
 //   - info
 //
 // +kubebuilder:validation:Enum=critical;high;low;medium;info
-type PolicyResultSeverity string
+type ResultSeverity string
 
-// PolicyReportResult provides the result for an individual policy
-type PolicyReportResult struct {
+// ReportResult provides the result for an individual policy
+type ReportResult struct {
 
 	// Source is an identifier for the policy engine that manages this report
 	// If the Source is specified at this level, it will override the Source
-	// field set at the PolicyReport level
+	// field set at the Report level
 	// +optional
 	Source string `json:"source"`
 
@@ -105,13 +105,13 @@ type PolicyReportResult struct {
 
 	// Severity indicates policy check result criticality
 	// +optional
-	Severity PolicyResultSeverity `json:"severity,omitempty"`
+	Severity ResultSeverity `json:"severity,omitempty"`
 
 	// Timestamp indicates the time the result was found
 	Timestamp metav1.Timestamp `json:"timestamp,omitempty"`
 
 	// Result indicates the outcome of the policy rule execution
-	Result PolicyResult `json:"result,omitempty"`
+	Result Result `json:"result,omitempty"`
 
 	// Scored indicates if this result is scored
 	Scored bool `json:"scored,omitempty"`
@@ -146,17 +146,17 @@ type PolicyReportResult struct {
 // +kubebuilder:printcolumn:name="Error",type=integer,JSONPath=`.summary.error`
 // +kubebuilder:printcolumn:name="Skip",type=integer,JSONPath=`.summary.skip`
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
-// +kubebuilder:resource:shortName=polr
+// +kubebuilder:resource:shortName=reps
 
-// PolicyReport is the Schema for the policyreports API
-type PolicyReport struct {
+// Report is the Schema for the reports API
+type Report struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Source is an identifier for the source e.g. a policy engine that manages this report.
 	// Use this field if all the results are produced by a single policy engine.
 	// If the results are produced by multiple sources e.g. different engines or scanners,
-	// then use the Source field at the PolicyReportResult level.
+	// then use the Source field at the ReportResult level.
 	// +optional
 	Source string `json:"source"`
 
@@ -170,28 +170,28 @@ type PolicyReport struct {
 	ScopeSelector *metav1.LabelSelector `json:"scopeSelector,omitempty"`
 
 	// Configuration is an optional field which can be used to specify
-	// a contract between PolicyReport generators and consumers
+	// a contract between Report generators and consumers
 	// +optional
-	Configuration *PolicyReportConfiguration `json:"configuration,omitempty"`
+	Configuration *ReportConfiguration `json:"configuration,omitempty"`
 
-	// PolicyReportSummary provides a summary of results
+	// ReportSummary provides a summary of results
 	// +optional
-	Summary PolicyReportSummary `json:"summary,omitempty"`
+	Summary ReportSummary `json:"summary,omitempty"`
 
-	// PolicyReportResult provides result details
+	// ReportResult provides result details
 	// +optional
-	Results []PolicyReportResult `json:"results,omitempty"`
+	Results []ReportResult `json:"results,omitempty"`
 }
 
-// PolicyReportList contains a list of PolicyReport
+// ReportList contains a list of Report
 // +kubebuilder:object:root=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-type PolicyReportList struct {
+type ReportList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []PolicyReport `json:"items"`
+	Items           []Report `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&PolicyReport{}, &PolicyReportList{})
+	SchemeBuilder.Register(&Report{}, &ReportList{})
 }

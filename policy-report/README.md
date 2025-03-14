@@ -1,16 +1,14 @@
-# Kubernetes Policy Report API
+# Report API
 
-**NOTE: The Policy Report API specification is currently in review. See [KEP 4447](https://github.com/kubernetes/enhancements/pull/4448)**
-
-The Kubernetes Policy Report API enables uniform reporting of results and findings from policy engines, scanners, or other tooling.
+The Report API enables uniform reporting of results and findings from policy engines, scanners, or other tooling.
 
 This repository contains the API specification and Custom Resource Definitions (CRDs).
 
 ## Concepts
 
-The API provides a `ClusterPolicyReport` and its namespaced variant `PolicyReport`.
+The API provides a `ClusterReport` and its namespaced variant `Report`.
 
-Each `PolicyReport` contains a set of `results` and a `summary`. Each `result` contains attributes such as the source policy and rule name, severity, timestamp, and the resource.
+Each `Report` contains a set of `results` and a `summary`. Each `result` contains attributes such as the source policy and rule name, severity, timestamp, and the resource.
 
 ## Reference
 
@@ -18,12 +16,12 @@ Each `PolicyReport` contains a set of `results` and a `summary`. Each `result` c
 
 ## Demonstration
 
-Typically the Policy Report API is installed and managed by a [producer](#producers). However, to try out the API in a test cluster you can follow the steps below:
+Typically the Report API is installed and managed by a [producer](#producers). However, to try out the API in a test cluster you can follow the steps below:
 
-1. Add Policy Report API CRDs to your cluster (v1beta2):
+1. Add Report API CRDs to your cluster (v1beta2):
 
 ```sh
-kubectl create -f crd/v1beta2/
+kubectl create -f crd/reports.x-k8s.io/v1beta2/
 ```
 2. Create a sample policy report resource:
 
@@ -33,7 +31,7 @@ kubectl create -f samples/sample-cis-k8s.yaml
 3. View policy report resources:
 
 ```sh
-kubectl get policyreports
+kubectl get reports
 ```
 
 ## Implementations
@@ -51,6 +49,7 @@ The following is a list of projects that produce or consume policy reports:
 * [Netchecks](https://docs.netchecks.io/)
 * [Tracee Adapter](https://github.com/fjogeleit/tracee-polr-adapter)
 * [Trivy Operator](https://aquasecurity.github.io/trivy-operator/v0.15.1/tutorials/integrations/policy-reporter/)
+* [Kubewarden](https://docs.kubewarden.io/explanations/audit-scanner/policy-reports)
 
 ### Consumers
 
@@ -66,8 +65,6 @@ make all
 
 ## Community, discussion, contribution, and support
 
-Learn how to engage with the Kubernetes community on the [community page](http://kubernetes.io/community/).
-
 You can reach the maintainers of this project at:
 
 - [Slack](https://kubernetes.slack.com/messages/wg-policy)
@@ -76,12 +73,12 @@ You can reach the maintainers of this project at:
 
 ### Code of conduct
 
-Participation in the Kubernetes community is governed by the [Kubernetes Code of Conduct](code-of-conduct.md).
+Participation in the OpenReport community is governed by the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md).
 
 [owners]: https://git.k8s.io/community/contributors/guide/owners.md
 [Creative Commons 4.0]: https://git.k8s.io/website/LICENSE
 
 # Historical References
 
-See the [proposal](https://docs.google.com/document/d/1nICYLkYS1RE3gJzuHOfHeAC25QIkFZfgymFjgOzMDVw/edit#) for background and details.
+See the [Kubernetes policy working group](https://github.com/kubernetes-sigs/wg-policy-prototypes/tree/master) and the [proposal](https://docs.google.com/document/d/1nICYLkYS1RE3gJzuHOfHeAC25QIkFZfgymFjgOzMDVw/edit#) for background and details.
 

@@ -27,8 +27,8 @@ import (
 
 type ReportsV1beta2Interface interface {
 	RESTClient() rest.Interface
-	ClusterPolicyReportsGetter
-	PolicyReportsGetter
+	ClusterReportsGetter
+	ReportsGetter
 }
 
 // ReportsV1beta2Client is used to interact with features provided by the reports.x-k8s.io group.
@@ -36,12 +36,12 @@ type ReportsV1beta2Client struct {
 	restClient rest.Interface
 }
 
-func (c *ReportsV1beta2Client) ClusterPolicyReports() ClusterPolicyReportInterface {
-	return newClusterPolicyReports(c)
+func (c *ReportsV1beta2Client) ClusterReports() ClusterReportInterface {
+	return newClusterReports(c)
 }
 
-func (c *ReportsV1beta2Client) PolicyReports(namespace string) PolicyReportInterface {
-	return newPolicyReports(c, namespace)
+func (c *ReportsV1beta2Client) Reports(namespace string) ReportInterface {
+	return newReports(c, namespace)
 }
 
 // NewForConfig creates a new ReportsV1beta2Client for the given config.
