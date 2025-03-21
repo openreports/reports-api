@@ -1,6 +1,6 @@
-# Report API
+# OpenReports API
 
-The Report API enables uniform reporting of results and findings from policy engines, scanners, or other tooling.
+The OpenReports API enables uniform reporting of results and findings from policy engines, scanners, or other tooling.
 
 This repository contains the API specification and Custom Resource Definitions (CRDs).
 
@@ -38,9 +38,9 @@ kubectl get reports
 
 The following is a list of projects that produce or consume policy reports:
 
-*(To add your project, please create a [pull request](https://github.com/kubernetes-sigs/wg-policy-prototypes/pulls).)*
+*(To add your project, please create a [pull request](https://github.com/openreports/reports-api/pulls).)*
 
-### Producers
+### Report Producers
 
 * [Falco](https://github.com/falcosecurity/falcosidekick/blob/master/outputs/policyreport.go)
 * [Image Scanner](https://github.com/statnett/image-scanner-operator)
@@ -51,10 +51,12 @@ The following is a list of projects that produce or consume policy reports:
 * [Trivy Operator](https://aquasecurity.github.io/trivy-operator/v0.15.1/tutorials/integrations/policy-reporter/)
 * [Kubewarden](https://docs.kubewarden.io/explanations/audit-scanner/policy-reports)
 
-### Consumers
+### Report Consumers
 
 * [Fairwinds Insights](https://fairwinds.com/insights)
 * [Kyverno Policy Reporter](https://kyverno.github.io/policy-reporter/)
+* [Lula](https://github.com/defenseunicorns/lula)
+* [Nirmata Control Hub](https://nirmata.com/nirmata-control-hub/)
 * [Open Cluster Management](https://open-cluster-management.io/)
 
 ## Building 
@@ -67,9 +69,8 @@ make all
 
 You can reach the maintainers of this project at:
 
-- [Slack](https://kubernetes.slack.com/messages/wg-policy)
-- [Mailing List](https://groups.google.com/forum/#!forum/kubernetes-wg-policy)
-- [WG Policy](https://github.com/kubernetes/community/blob/master/wg-policy/README.md)
+- [Slack](https://cloud-native.slack.com/archives/C08JH5223A6)
+- [GitHub](https://github.com/orgs/openreports/discussions)
 
 ### Code of conduct
 
@@ -80,5 +81,5 @@ Participation in the OpenReport community is governed by the [CNCF Code of Condu
 
 # Historical References
 
-See the [Kubernetes policy working group](https://github.com/kubernetes-sigs/wg-policy-prototypes/tree/master) and the [proposal](https://docs.google.com/document/d/1nICYLkYS1RE3gJzuHOfHeAC25QIkFZfgymFjgOzMDVw/edit#) for background and details.
+See the [Kubernetes Policy Working Group repository](https://github.com/kubernetes-sigs/wg-policy-prototypes/tree/master/policy-report) and the [Policy Reports API proposal](https://docs.google.com/document/d/1nICYLkYS1RE3gJzuHOfHeAC25QIkFZfgymFjgOzMDVw/edit#) for background and details.
 
