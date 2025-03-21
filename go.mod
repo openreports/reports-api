@@ -1,8 +1,6 @@
-module sigs.k8s.io/wg-policy-prototypes
+module openreports.io
 
-go 1.22.0
-
-toolchain go1.22.1
+go 1.24.1
 
 require (
 	k8s.io/api v0.29.3
