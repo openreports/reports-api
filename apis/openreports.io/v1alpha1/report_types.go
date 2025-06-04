@@ -14,6 +14,11 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+	"slices"
+	"strconv"
+
+	"github.com/segmentio/fasthash/fnv1a"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -85,6 +90,7 @@ type ResultSeverity string
 
 // ReportResult provides the result for an individual policy
 type ReportResult struct {
+	ID string
 
 	// Source is an identifier for the policy engine that manages this report
 	// If the Source is specified at this level, it will override the Source
@@ -181,6 +187,89 @@ type Report struct {
 	// ReportResult provides result details
 	// +optional
 	Results []ReportResult `json:"results,omitempty"`
+}
+
+func (r *Report) GetResults() []ReportResult {
+	return r.Results
+}
+
+func (r *Report) HasResult(id string) bool {
+	for _, r := range r.Results {
+		if r.GetID() == id {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (r *Report) SetResults(results []ReportResult) {
+	r.Results = results
+}
+
+func (r *Report) GetSummary() ReportSummary {
+	return r.Summary
+}
+
+func (r *Report) GetSource() string {
+	if len(r.Results) == 0 {
+		return ""
+	}
+
+	return r.Results[0].Source
+}
+
+func (r *Report) GetKinds() []string {
+	if r.GetScope() != nil {
+		return []string{r.Scope.Kind}
+	}
+
+	list := make([]string, 0)
+	for _, k := range r.Results {
+		if !k.HasResource() {
+			continue
+		}
+
+		kind := k.GetResource().Kind
+
+		if kind == "" || slices.Contains(list, kind) {
+			continue
+		}
+
+		list = append(list, kind)
+	}
+
+	return list
+}
+
+func (r *Report) GetSeverities() []string {
+	list := make([]string, 0)
+	for _, k := range r.Results {
+
+		if k.Severity == "" || slices.Contains(list, string(k.Severity)) {
+			continue
+		}
+
+		list = append(list, string(k.Severity))
+	}
+
+	return list
+}
+
+func (r *Report) GetID() string {
+	h1 := fnv1a.Init64
+	h1 = fnv1a.AddString64(h1, r.GetName())
+	h1 = fnv1a.AddString64(h1, r.GetNamespace())
+
+	return strconv.FormatUint(h1, 10)
+}
+
+func (r *Report) GetKey() string {
+	return fmt.Sprintf("%s/%s", r.Namespace, r.Name)
+}
+
+func (r *Report) GetScope() *corev1.ObjectReference {
+	return r.Scope
 }
 
 // ReportList contains a list of Report

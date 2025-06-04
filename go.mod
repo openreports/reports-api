@@ -3,6 +3,7 @@ module openreports.io
 go 1.24.1
 
 require (
+	github.com/segmentio/fasthash v1.0.3
 	k8s.io/api v0.29.3
 	k8s.io/apimachinery v0.30.0-rc.2
 	k8s.io/client-go v0.29.3

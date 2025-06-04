@@ -17,6 +17,11 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+	"slices"
+	"strconv"
+
+	"github.com/segmentio/fasthash/fnv1a"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -72,6 +77,88 @@ type ClusterReport struct {
 	// ReportResult provides result details
 	// +optional
 	Results []ReportResult `json:"results,omitempty"`
+}
+
+func (r *ClusterReport) GetResults() []ReportResult {
+	return r.Results
+}
+
+func (r *ClusterReport) HasResult(id string) bool {
+	for _, r := range r.Results {
+		if r.GetID() == id {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (r *ClusterReport) SetResults(results []ReportResult) {
+	r.Results = results
+}
+
+func (r *ClusterReport) GetSummary() ReportSummary {
+	return r.Summary
+}
+
+func (r *ClusterReport) GetSource() string {
+	if len(r.Results) == 0 {
+		return ""
+	}
+
+	return r.Results[0].Source
+}
+
+func (r *ClusterReport) GetKinds() []string {
+	if r.GetScope() != nil {
+		return []string{r.Scope.Kind}
+	}
+
+	list := make([]string, 0)
+	for _, k := range r.Results {
+		if !k.HasResource() {
+			continue
+		}
+
+		kind := k.GetResource().Kind
+
+		if kind == "" || slices.Contains(list, kind) {
+			continue
+		}
+
+		list = append(list, kind)
+	}
+
+	return list
+}
+
+func (r *ClusterReport) GetSeverities() []string {
+	list := make([]string, 0)
+	for _, k := range r.Results {
+
+		if k.Severity == "" || slices.Contains(list, string(k.Severity)) {
+			continue
+		}
+
+		list = append(list, string(k.Severity))
+	}
+
+	return list
+}
+
+func (r *ClusterReport) GetID() string {
+	h1 := fnv1a.Init64
+	h1 = fnv1a.AddString64(h1, r.GetName())
+
+	return strconv.FormatUint(h1, 10)
+}
+
+func (r *ClusterReport) GetKey() string {
+	return fmt.Sprintf("%s/%s", r.Namespace, r.Name)
+}
+
+func (r *ClusterReport) GetScope() *corev1.ObjectReference {
+	return r.Scope
 }
 
 // ClusterReportList contains a list of ClusterReport
