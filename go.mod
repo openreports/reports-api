@@ -1,13 +1,12 @@
 module openreports.io
 
-go 1.24.1
+go 1.24.0
 
 require (
-	k8s.io/api v0.29.3
-	k8s.io/apimachinery v0.30.0-rc.2
-	k8s.io/client-go v0.29.3
-	k8s.io/code-generator v0.30.0-rc.2
-	sigs.k8s.io/controller-runtime v0.16.3
+	k8s.io/api v0.30.0
+	k8s.io/apimachinery v0.30.0
+	k8s.io/client-go v0.30.0
+	k8s.io/code-generator v0.30.0
 )
 
 require (

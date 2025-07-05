@@ -193,5 +193,5 @@ type ReportList struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&Report{}, &ReportList{})
+	objectTypes = append(objectTypes, &Report{}, &ReportList{})
 }
