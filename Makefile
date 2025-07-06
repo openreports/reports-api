@@ -14,7 +14,7 @@ LOCALBIN ?= $(shell pwd)/bin
 $(LOCALBIN):
 	mkdir -p $(LOCALBIN)
 
-CONTROLLER_TOOLS_VERSION           ?= v0.14.0
+CONTROLLER_TOOLS_VERSION           ?= v0.18.0
 CONTROLLER_GEN                     ?= $(LOCALBIN)/controller-gen
 GEN_CRD_API_REFERENCE_DOCS         ?= $(LOCALBIN)/crd-ref-docs
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= latest

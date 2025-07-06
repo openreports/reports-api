@@ -28,11 +28,11 @@ type FakeOpenreportsV1alpha1 struct {
 }
 
 func (c *FakeOpenreportsV1alpha1) ClusterReports() v1alpha1.ClusterReportInterface {
-	return &FakeClusterReports{c}
+	return newFakeClusterReports(c)
 }
 
 func (c *FakeOpenreportsV1alpha1) Reports(namespace string) v1alpha1.ReportInterface {
-	return &FakeReports{c, namespace}
+	return newFakeReports(c, namespace)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

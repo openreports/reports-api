@@ -18,103 +18,34 @@ limitations under the License.
 package fake
 
 import (
-	"context"
-
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	gentype "k8s.io/client-go/gentype"
 	v1alpha1 "openreports.io/apis/openreports.io/v1alpha1"
+	openreportsiov1alpha1 "openreports.io/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1"
 )
 
-// FakeClusterReports implements ClusterReportInterface
-type FakeClusterReports struct {
+// fakeClusterReports implements ClusterReportInterface
+type fakeClusterReports struct {
+	*gentype.FakeClientWithList[*v1alpha1.ClusterReport, *v1alpha1.ClusterReportList]
 	Fake *FakeOpenreportsV1alpha1
 }
 
-var clusterreportsResource = v1alpha1.SchemeGroupVersion.WithResource("clusterreports")
-
-var clusterreportsKind = v1alpha1.SchemeGroupVersion.WithKind("ClusterReport")
-
-// Get takes name of the clusterReport, and returns the corresponding clusterReport object, and an error if there is any.
-func (c *FakeClusterReports) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.ClusterReport, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(clusterreportsResource, name), &v1alpha1.ClusterReport{})
-	if obj == nil {
-		return nil, err
+func newFakeClusterReports(fake *FakeOpenreportsV1alpha1) openreportsiov1alpha1.ClusterReportInterface {
+	return &fakeClusterReports{
+		gentype.NewFakeClientWithList[*v1alpha1.ClusterReport, *v1alpha1.ClusterReportList](
+			fake.Fake,
+			"",
+			v1alpha1.SchemeGroupVersion.WithResource("clusterreports"),
+			v1alpha1.SchemeGroupVersion.WithKind("ClusterReport"),
+			func() *v1alpha1.ClusterReport { return &v1alpha1.ClusterReport{} },
+			func() *v1alpha1.ClusterReportList { return &v1alpha1.ClusterReportList{} },
+			func(dst, src *v1alpha1.ClusterReportList) { dst.ListMeta = src.ListMeta },
+			func(list *v1alpha1.ClusterReportList) []*v1alpha1.ClusterReport {
+				return gentype.ToPointerSlice(list.Items)
+			},
+			func(list *v1alpha1.ClusterReportList, items []*v1alpha1.ClusterReport) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1alpha1.ClusterReport), err
-}
-
-// List takes label and field selectors, and returns the list of ClusterReports that match those selectors.
-func (c *FakeClusterReports) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.ClusterReportList, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(clusterreportsResource, clusterreportsKind, opts), &v1alpha1.ClusterReportList{})
-	if obj == nil {
-		return nil, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1alpha1.ClusterReportList{ListMeta: obj.(*v1alpha1.ClusterReportList).ListMeta}
-	for _, item := range obj.(*v1alpha1.ClusterReportList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested clusterReports.
-func (c *FakeClusterReports) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewRootWatchAction(clusterreportsResource, opts))
-}
-
-// Create takes the representation of a clusterReport and creates it.  Returns the server's representation of the clusterReport, and an error, if there is any.
-func (c *FakeClusterReports) Create(ctx context.Context, clusterReport *v1alpha1.ClusterReport, opts v1.CreateOptions) (result *v1alpha1.ClusterReport, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(clusterreportsResource, clusterReport), &v1alpha1.ClusterReport{})
-	if obj == nil {
-		return nil, err
-	}
-	return obj.(*v1alpha1.ClusterReport), err
-}
-
-// Update takes the representation of a clusterReport and updates it. Returns the server's representation of the clusterReport, and an error, if there is any.
-func (c *FakeClusterReports) Update(ctx context.Context, clusterReport *v1alpha1.ClusterReport, opts v1.UpdateOptions) (result *v1alpha1.ClusterReport, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(clusterreportsResource, clusterReport), &v1alpha1.ClusterReport{})
-	if obj == nil {
-		return nil, err
-	}
-	return obj.(*v1alpha1.ClusterReport), err
-}
-
-// Delete takes name of the clusterReport and deletes it. Returns an error if one occurs.
-func (c *FakeClusterReports) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewRootDeleteActionWithOptions(clusterreportsResource, name, opts), &v1alpha1.ClusterReport{})
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakeClusterReports) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(clusterreportsResource, listOpts)
-
-	_, err := c.Fake.Invokes(action, &v1alpha1.ClusterReportList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched clusterReport.
-func (c *FakeClusterReports) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.ClusterReport, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(clusterreportsResource, name, pt, data, subresources...), &v1alpha1.ClusterReport{})
-	if obj == nil {
-		return nil, err
-	}
-	return obj.(*v1alpha1.ClusterReport), err
 }

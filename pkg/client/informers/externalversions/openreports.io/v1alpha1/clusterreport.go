@@ -18,24 +18,24 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	openreportsiov1alpha1 "openreports.io/apis/openreports.io/v1alpha1"
+	apisopenreportsiov1alpha1 "openreports.io/apis/openreports.io/v1alpha1"
 	versioned "openreports.io/pkg/client/clientset/versioned"
 	internalinterfaces "openreports.io/pkg/client/informers/externalversions/internalinterfaces"
-	v1alpha1 "openreports.io/pkg/client/listers/openreports.io/v1alpha1"
+	openreportsiov1alpha1 "openreports.io/pkg/client/listers/openreports.io/v1alpha1"
 )
 
 // ClusterReportInformer provides access to a shared informer and lister for
 // ClusterReports.
 type ClusterReportInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.ClusterReportLister
+	Lister() openreportsiov1alpha1.ClusterReportLister
 }
 
 type clusterReportInformer struct {
@@ -60,16 +60,28 @@ func NewFilteredClusterReportInformer(client versioned.Interface, resyncPeriod t
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.OpenreportsV1alpha1().ClusterReports().List(context.TODO(), options)
+				return client.OpenreportsV1alpha1().ClusterReports().List(context.Background(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.OpenreportsV1alpha1().ClusterReports().Watch(context.TODO(), options)
+				return client.OpenreportsV1alpha1().ClusterReports().Watch(context.Background(), options)
+			},
+			ListWithContextFunc: func(ctx context.Context, options v1.ListOptions) (runtime.Object, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.OpenreportsV1alpha1().ClusterReports().List(ctx, options)
+			},
+			WatchFuncWithContext: func(ctx context.Context, options v1.ListOptions) (watch.Interface, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.OpenreportsV1alpha1().ClusterReports().Watch(ctx, options)
 			},
 		},
-		&openreportsiov1alpha1.ClusterReport{},
+		&apisopenreportsiov1alpha1.ClusterReport{},
 		resyncPeriod,
 		indexers,
 	)
@@ -80,9 +92,9 @@ func (f *clusterReportInformer) defaultInformer(client versioned.Interface, resy
 }
 
 func (f *clusterReportInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&openreportsiov1alpha1.ClusterReport{}, f.defaultInformer)
+	return f.factory.InformerFor(&apisopenreportsiov1alpha1.ClusterReport{}, f.defaultInformer)
 }
 
-func (f *clusterReportInformer) Lister() v1alpha1.ClusterReportLister {
-	return v1alpha1.NewClusterReportLister(f.Informer().GetIndexer())
+func (f *clusterReportInformer) Lister() openreportsiov1alpha1.ClusterReportLister {
+	return openreportsiov1alpha1.NewClusterReportLister(f.Informer().GetIndexer())
 }
