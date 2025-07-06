@@ -18,10 +18,10 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/tools/cache"
-	v1alpha1 "openreports.io/apis/openreports.io/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
+	openreportsiov1alpha1 "openreports.io/apis/openreports.io/v1alpha1"
 )
 
 // ClusterReportLister helps list ClusterReports.
@@ -29,39 +29,19 @@ import (
 type ClusterReportLister interface {
 	// List lists all ClusterReports in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.ClusterReport, err error)
+	List(selector labels.Selector) (ret []*openreportsiov1alpha1.ClusterReport, err error)
 	// Get retrieves the ClusterReport from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.ClusterReport, error)
+	Get(name string) (*openreportsiov1alpha1.ClusterReport, error)
 	ClusterReportListerExpansion
 }
 
 // clusterReportLister implements the ClusterReportLister interface.
 type clusterReportLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*openreportsiov1alpha1.ClusterReport]
 }
 
 // NewClusterReportLister returns a new ClusterReportLister.
 func NewClusterReportLister(indexer cache.Indexer) ClusterReportLister {
-	return &clusterReportLister{indexer: indexer}
-}
-
-// List lists all ClusterReports in the indexer.
-func (s *clusterReportLister) List(selector labels.Selector) (ret []*v1alpha1.ClusterReport, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.ClusterReport))
-	})
-	return ret, err
-}
-
-// Get retrieves the ClusterReport from the index for a given name.
-func (s *clusterReportLister) Get(name string) (*v1alpha1.ClusterReport, error) {
-	obj, exists, err := s.indexer.GetByKey(name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("clusterreport"), name)
-	}
-	return obj.(*v1alpha1.ClusterReport), nil
+	return &clusterReportLister{listers.New[*openreportsiov1alpha1.ClusterReport](indexer, openreportsiov1alpha1.Resource("clusterreport"))}
 }
