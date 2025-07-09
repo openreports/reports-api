@@ -3,11 +3,11 @@ entries:
   openreports:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2025-07-09T13:00:21.466387+03:00"
+    created: "2025-07-09T14:52:55.364719+03:00"
     description: A Helm chart for installing openreports APIs.
-    digest: bb516e3ca6357be87e5110acc67615d19dfe255bdd8bd77e2111b418aee76798
+    digest: 3ad112726e16cb29253c9e2fabcd8f3e7113580d98e0b712a1e67f25d03ba2dd
     name: openreports
     urls:
     - https://openreports.github.io/reports-api/openreports-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-09T13:00:21.465556+03:00"
+generated: "2025-07-09T14:52:55.364161+03:00"
