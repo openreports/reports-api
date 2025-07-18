@@ -20,9 +20,9 @@ package v1alpha1
 import (
 	http "net/http"
 
+	openreportsiov1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
+	scheme "github.com/openreports/reports-api/pkg/client/clientset/versioned/scheme"
 	rest "k8s.io/client-go/rest"
-	openreportsiov1alpha1 "openreports.io/apis/openreports.io/v1alpha1"
-	scheme "openreports.io/pkg/client/clientset/versioned/scheme"
 )
 
 type OpenreportsV1alpha1Interface interface {

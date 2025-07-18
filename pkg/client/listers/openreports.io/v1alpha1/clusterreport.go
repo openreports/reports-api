@@ -18,10 +18,10 @@ limitations under the License.
 package v1alpha1
 
 import (
+	openreportsiov1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	listers "k8s.io/client-go/listers"
 	cache "k8s.io/client-go/tools/cache"
-	openreportsiov1alpha1 "openreports.io/apis/openreports.io/v1alpha1"
 )
 
 // ClusterReportLister helps list ClusterReports.

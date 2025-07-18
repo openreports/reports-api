@@ -22,13 +22,13 @@ import (
 	sync "sync"
 	time "time"
 
+	versioned "github.com/openreports/reports-api/pkg/client/clientset/versioned"
+	internalinterfaces "github.com/openreports/reports-api/pkg/client/informers/externalversions/internalinterfaces"
+	openreportsio "github.com/openreports/reports-api/pkg/client/informers/externalversions/openreports.io"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
-	versioned "openreports.io/pkg/client/clientset/versioned"
-	internalinterfaces "openreports.io/pkg/client/informers/externalversions/internalinterfaces"
-	openreportsio "openreports.io/pkg/client/informers/externalversions/openreports.io"
 )
 
 // SharedInformerOption defines the functional option type for SharedInformerFactory.

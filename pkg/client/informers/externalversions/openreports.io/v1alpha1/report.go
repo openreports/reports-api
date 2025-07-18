@@ -21,14 +21,14 @@ import (
 	context "context"
 	time "time"
 
+	apisopenreportsiov1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
+	versioned "github.com/openreports/reports-api/pkg/client/clientset/versioned"
+	internalinterfaces "github.com/openreports/reports-api/pkg/client/informers/externalversions/internalinterfaces"
+	openreportsiov1alpha1 "github.com/openreports/reports-api/pkg/client/listers/openreports.io/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	apisopenreportsiov1alpha1 "openreports.io/apis/openreports.io/v1alpha1"
-	versioned "openreports.io/pkg/client/clientset/versioned"
-	internalinterfaces "openreports.io/pkg/client/informers/externalversions/internalinterfaces"
-	openreportsiov1alpha1 "openreports.io/pkg/client/listers/openreports.io/v1alpha1"
 )
 
 // ReportInformer provides access to a shared informer and lister for

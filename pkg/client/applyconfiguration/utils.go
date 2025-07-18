@@ -18,12 +18,12 @@ limitations under the License.
 package applyconfiguration
 
 import (
+	v1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
+	internal "github.com/openreports/reports-api/pkg/client/applyconfiguration/internal"
+	openreportsiov1alpha1 "github.com/openreports/reports-api/pkg/client/applyconfiguration/openreports.io/v1alpha1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	testing "k8s.io/client-go/testing"
-	v1alpha1 "openreports.io/apis/openreports.io/v1alpha1"
-	internal "openreports.io/pkg/client/applyconfiguration/internal"
-	openreportsiov1alpha1 "openreports.io/pkg/client/applyconfiguration/openreports.io/v1alpha1"
 )
 
 // ForKind returns an apply configuration type for the given GroupVersionKind, or nil if no

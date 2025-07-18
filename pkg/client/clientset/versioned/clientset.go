@@ -21,10 +21,10 @@ import (
 	fmt "fmt"
 	http "net/http"
 
+	openreportsv1alpha1 "github.com/openreports/reports-api/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
-	openreportsv1alpha1 "openreports.io/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1"
 )
 
 type Interface interface {

@@ -18,7 +18,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	openreportsiov1alpha1 "openreports.io/apis/openreports.io/v1alpha1"
+	openreportsiov1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
 )
 
 // LimitsApplyConfiguration represents a declarative configuration of the Limits type for use

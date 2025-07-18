@@ -18,9 +18,9 @@ limitations under the License.
 package fake
 
 import (
+	v1alpha1 "github.com/openreports/reports-api/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
-	v1alpha1 "openreports.io/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1"
 )
 
 type FakeOpenreportsV1alpha1 struct {

@@ -18,9 +18,9 @@ limitations under the License.
 package fake
 
 import (
+	v1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
+	openreportsiov1alpha1 "github.com/openreports/reports-api/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1"
 	gentype "k8s.io/client-go/gentype"
-	v1alpha1 "openreports.io/apis/openreports.io/v1alpha1"
-	openreportsiov1alpha1 "openreports.io/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1"
 )
 
 // fakeReports implements ReportInterface
