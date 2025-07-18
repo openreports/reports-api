@@ -1,4 +1,4 @@
-module openreports.io
+module github.com/openreports/reports-api
 
 go 1.24.0
 

@@ -20,12 +20,12 @@ package v1alpha1
 import (
 	context "context"
 
+	openreportsiov1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
+	scheme "github.com/openreports/reports-api/pkg/client/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	gentype "k8s.io/client-go/gentype"
-	openreportsiov1alpha1 "openreports.io/apis/openreports.io/v1alpha1"
-	scheme "openreports.io/pkg/client/clientset/versioned/scheme"
 )
 
 // ReportsGetter has a method to return a ReportInterface.

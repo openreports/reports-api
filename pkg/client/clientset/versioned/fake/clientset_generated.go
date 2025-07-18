@@ -18,15 +18,15 @@ limitations under the License.
 package fake
 
 import (
+	clientset "github.com/openreports/reports-api/pkg/client/clientset/versioned"
+	openreportsv1alpha1 "github.com/openreports/reports-api/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1"
+	fakeopenreportsv1alpha1 "github.com/openreports/reports-api/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1/fake"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
 	fakediscovery "k8s.io/client-go/discovery/fake"
 	"k8s.io/client-go/testing"
-	clientset "openreports.io/pkg/client/clientset/versioned"
-	openreportsv1alpha1 "openreports.io/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1"
-	fakeopenreportsv1alpha1 "openreports.io/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1/fake"
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.

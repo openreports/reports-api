@@ -33,6 +33,6 @@ kube::codegen::gen_helpers \
 kube::codegen::gen_client \
     --with-watch \
     --output-dir "${SCRIPT_ROOT}/pkg/client" \
-    --output-pkg "openreports.io/pkg/client" \
+    --output-pkg "github.com/openreports/reports-api/pkg/client" \
     --boilerplate "${SCRIPT_ROOT}/hack/boilerplate.go.txt" \
     "${SCRIPT_ROOT}/apis"

@@ -18,7 +18,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	internalinterfaces "openreports.io/pkg/client/informers/externalversions/internalinterfaces"
+	internalinterfaces "github.com/openreports/reports-api/pkg/client/informers/externalversions/internalinterfaces"
 )
 
 // Interface provides access to all the informers in this group version.
