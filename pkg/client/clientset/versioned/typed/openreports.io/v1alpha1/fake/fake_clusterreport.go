@@ -19,19 +19,20 @@ package fake
 
 import (
 	v1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
-	openreportsiov1alpha1 "github.com/openreports/reports-api/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1"
+	openreportsiov1alpha1 "github.com/openreports/reports-api/pkg/client/applyconfiguration/openreports.io/v1alpha1"
+	typedopenreportsiov1alpha1 "github.com/openreports/reports-api/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1"
 	gentype "k8s.io/client-go/gentype"
 )
 
 // fakeClusterReports implements ClusterReportInterface
 type fakeClusterReports struct {
-	*gentype.FakeClientWithList[*v1alpha1.ClusterReport, *v1alpha1.ClusterReportList]
+	*gentype.FakeClientWithListAndApply[*v1alpha1.ClusterReport, *v1alpha1.ClusterReportList, *openreportsiov1alpha1.ClusterReportApplyConfiguration]
 	Fake *FakeOpenreportsV1alpha1
 }
 
-func newFakeClusterReports(fake *FakeOpenreportsV1alpha1) openreportsiov1alpha1.ClusterReportInterface {
+func newFakeClusterReports(fake *FakeOpenreportsV1alpha1) typedopenreportsiov1alpha1.ClusterReportInterface {
 	return &fakeClusterReports{
-		gentype.NewFakeClientWithList[*v1alpha1.ClusterReport, *v1alpha1.ClusterReportList](
+		gentype.NewFakeClientWithListAndApply[*v1alpha1.ClusterReport, *v1alpha1.ClusterReportList, *openreportsiov1alpha1.ClusterReportApplyConfiguration](
 			fake.Fake,
 			"",
 			v1alpha1.SchemeGroupVersion.WithResource("clusterreports"),

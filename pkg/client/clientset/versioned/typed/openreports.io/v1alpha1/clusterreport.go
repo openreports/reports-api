@@ -21,6 +21,7 @@ import (
 	context "context"
 
 	openreportsiov1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
+	applyconfigurationopenreportsiov1alpha1 "github.com/openreports/reports-api/pkg/client/applyconfiguration/openreports.io/v1alpha1"
 	scheme "github.com/openreports/reports-api/pkg/client/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -44,18 +45,19 @@ type ClusterReportInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*openreportsiov1alpha1.ClusterReportList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *openreportsiov1alpha1.ClusterReport, err error)
+	Apply(ctx context.Context, clusterReport *applyconfigurationopenreportsiov1alpha1.ClusterReportApplyConfiguration, opts v1.ApplyOptions) (result *openreportsiov1alpha1.ClusterReport, err error)
 	ClusterReportExpansion
 }
 
 // clusterReports implements ClusterReportInterface
 type clusterReports struct {
-	*gentype.ClientWithList[*openreportsiov1alpha1.ClusterReport, *openreportsiov1alpha1.ClusterReportList]
+	*gentype.ClientWithListAndApply[*openreportsiov1alpha1.ClusterReport, *openreportsiov1alpha1.ClusterReportList, *applyconfigurationopenreportsiov1alpha1.ClusterReportApplyConfiguration]
 }
 
 // newClusterReports returns a ClusterReports
 func newClusterReports(c *OpenreportsV1alpha1Client) *clusterReports {
 	return &clusterReports{
-		gentype.NewClientWithList[*openreportsiov1alpha1.ClusterReport, *openreportsiov1alpha1.ClusterReportList](
+		gentype.NewClientWithListAndApply[*openreportsiov1alpha1.ClusterReport, *openreportsiov1alpha1.ClusterReportList, *applyconfigurationopenreportsiov1alpha1.ClusterReportApplyConfiguration](
 			"clusterreports",
 			c.RESTClient(),
 			scheme.ParameterCodec,
