@@ -31,7 +31,6 @@ generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and
 
 .PHONY: generate-client
 generate-client:
-	$(CONTROLLER_GEN) applyconfiguration:headerFile="hack/boilerplate.go.txt" paths="./apis/..."
 	./hack/update-codegen.sh
 
 
