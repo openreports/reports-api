@@ -21,6 +21,7 @@ import (
 	context "context"
 
 	openreportsiov1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
+	applyconfigurationopenreportsiov1alpha1 "github.com/openreports/reports-api/pkg/client/applyconfiguration/openreports.io/v1alpha1"
 	scheme "github.com/openreports/reports-api/pkg/client/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -44,18 +45,19 @@ type ReportInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*openreportsiov1alpha1.ReportList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *openreportsiov1alpha1.Report, err error)
+	Apply(ctx context.Context, report *applyconfigurationopenreportsiov1alpha1.ReportApplyConfiguration, opts v1.ApplyOptions) (result *openreportsiov1alpha1.Report, err error)
 	ReportExpansion
 }
 
 // reports implements ReportInterface
 type reports struct {
-	*gentype.ClientWithList[*openreportsiov1alpha1.Report, *openreportsiov1alpha1.ReportList]
+	*gentype.ClientWithListAndApply[*openreportsiov1alpha1.Report, *openreportsiov1alpha1.ReportList, *applyconfigurationopenreportsiov1alpha1.ReportApplyConfiguration]
 }
 
 // newReports returns a Reports
 func newReports(c *OpenreportsV1alpha1Client, namespace string) *reports {
 	return &reports{
-		gentype.NewClientWithList[*openreportsiov1alpha1.Report, *openreportsiov1alpha1.ReportList](
+		gentype.NewClientWithListAndApply[*openreportsiov1alpha1.Report, *openreportsiov1alpha1.ReportList, *applyconfigurationopenreportsiov1alpha1.ReportApplyConfiguration](
 			"reports",
 			c.RESTClient(),
 			scheme.ParameterCodec,

@@ -19,19 +19,20 @@ package fake
 
 import (
 	v1alpha1 "github.com/openreports/reports-api/apis/openreports.io/v1alpha1"
-	openreportsiov1alpha1 "github.com/openreports/reports-api/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1"
+	openreportsiov1alpha1 "github.com/openreports/reports-api/pkg/client/applyconfiguration/openreports.io/v1alpha1"
+	typedopenreportsiov1alpha1 "github.com/openreports/reports-api/pkg/client/clientset/versioned/typed/openreports.io/v1alpha1"
 	gentype "k8s.io/client-go/gentype"
 )
 
 // fakeReports implements ReportInterface
 type fakeReports struct {
-	*gentype.FakeClientWithList[*v1alpha1.Report, *v1alpha1.ReportList]
+	*gentype.FakeClientWithListAndApply[*v1alpha1.Report, *v1alpha1.ReportList, *openreportsiov1alpha1.ReportApplyConfiguration]
 	Fake *FakeOpenreportsV1alpha1
 }
 
-func newFakeReports(fake *FakeOpenreportsV1alpha1, namespace string) openreportsiov1alpha1.ReportInterface {
+func newFakeReports(fake *FakeOpenreportsV1alpha1, namespace string) typedopenreportsiov1alpha1.ReportInterface {
 	return &fakeReports{
-		gentype.NewFakeClientWithList[*v1alpha1.Report, *v1alpha1.ReportList](
+		gentype.NewFakeClientWithListAndApply[*v1alpha1.Report, *v1alpha1.ReportList, *openreportsiov1alpha1.ReportApplyConfiguration](
 			fake.Fake,
 			namespace,
 			v1alpha1.SchemeGroupVersion.WithResource("reports"),
