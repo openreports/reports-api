@@ -28,6 +28,8 @@ jobs:
           skip-cache: true
       - name: go fmt check
         run: make fmt-check
+      - name: go imports check
+        run: make imports-check
       - name: Checking unused pkgs using go mod tidy
         run: make unused-package-check
       - name: Go vet
