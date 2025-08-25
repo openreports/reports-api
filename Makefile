@@ -71,27 +71,37 @@ unused-package-check:
 vet:
 	go vet ./...
 
+.PHONY: all
+all: # Generate all code and build the project
+all:
+	codegen-all build fmt vet
 
 ###########
 # CODEGEN #
 ###########
 
-all: code-generator manifests generate generate-api-docs generate-client build fmt vet 
+codegen-all: ## Generate all generated code
+codegen-all: codegen-code codegen-manifests codegen-controller codegen-api-docs codegen-client
 
-.PHONY: manifests
-manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+.PHONY: codegen-manifests
+codegen-manifests: ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+codegen-manifests: codegen-controller
 	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./apis/openreports.io/v1alpha1" output:crd:artifacts:config=crd/openreports.io/v1alpha1
 
-.PHONY: generate
-generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
-	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./apis/..."
 
-.PHONY: generate-client
-generate-client:
+.PHONY: codegen-controller
+codegen-controller: ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+codegen-controller: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary. If wrong version is installed, it will be overwritten.
+$(CONTROLLER_GEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/controller-gen && $(LOCALBIN)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
+	GOBIN=$(LOCALBIN) $(GO_CMD) install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
+
+.PHONY: codegen-client
+codegen-client:
 	./hack/update-codegen.sh
 
-.PHONY: controller-gen
-controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary. If wrong version is installed, it will be overwritten.
+.PHONY: codegen-controller
+codegen-controller: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary. If wrong version is installed, it will be overwritten.
 $(CONTROLLER_GEN): $(LOCALBIN)
 	test -s $(LOCALBIN)/controller-gen && $(LOCALBIN)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
 	GOBIN=$(LOCALBIN) $(GO_CMD) install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
@@ -100,29 +110,22 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 CODEGEN_VERSION := v0.30.0-rc.2
 CODEGEN = $(shell pwd)/bin/code-generator
 CODEGEN_ROOT = $(shell $(GO_CMD) env GOMODCACHE)/k8s.io/code-generator@$(CODEGEN_VERSION)
-.PHONY: code-generator
-code-generator:
+.PHONY: codegen-code
+codegen-code:
 	@GOBIN=$(PROJECT_DIR)/bin GO111MODULE=on $(GO_CMD) install k8s.io/code-generator/cmd/client-gen@$(CODEGEN_VERSION)
 	cp -f $(CODEGEN_ROOT)/generate-groups.sh $(PROJECT_DIR)/bin/
 	cp -f $(CODEGEN_ROOT)/generate-internal-groups.sh $(PROJECT_DIR)/bin/
 	cp -f $(CODEGEN_ROOT)/kube_codegen.sh $(PROJECT_DIR)/bin/
 
-# generate-api-docs will create api docs
-generate-api-docs: $(GEN_CRD_API_REFERENCE_DOCS)
+
+.PHONY: codegen-api-docs
+codegen-api-docs: ## Generate API docs
+codegen-api-docs: $(GEN_CRD_API_REFERENCE_DOCS)
 	$(GEN_CRD_API_REFERENCE_DOCS) --source-path=./apis/openreports.io/v1alpha1 --config=./docs/config.yaml --renderer=markdown --output-path=./docs/api-docs.md
 
 $(GEN_CRD_API_REFERENCE_DOCS): $(LOCALBIN)
 	$(call go-install-tool,$(GEN_CRD_API_REFERENCE_DOCS),github.com/elastic/crd-ref-docs,$(GEN_CRD_API_REFERENCE_DOCS_VERSION))
 
-.PHONY: codegen-api-docs
-codegen-api-docs: ## Generate API docs
-codegen-api-docs: $(PACKAGE_SHIM) $(GEN_CRD_API_REFERENCE_DOCS) $(GENREF) ## Generate API docs
-	@echo Generate api docs... >&2
-	$(GEN_CRD_API_REFERENCE_DOCS) -v=4 \
-		-api-dir pkg/api \
-		-config docs/config.json \
-		-template-dir docs/template \
-		-out-file docs/index.html
 
 .PHONY: codegen-manifest-release
 codegen-manifest-release: ## Create CRD release manifest
@@ -141,6 +144,18 @@ release-notes: ## Generate release notes
 	@echo Generating release notes... >&2
 	@bash -c 'while IFS= read -r line ; do if [[ "$$line" == "## "* && "$$line" != "## $(VERSION)" ]]; then break ; fi; echo "$$line"; done < "CHANGELOG.md"' \
 	true
+
+#################
+# VERIFY CODGEN #
+#################
+
+.PHONY: verify-codegen
+verify-codegen: ## Verify all generated code are up to date
+verify-codegen: codegen-all
+	@echo Checking git diff... >&2
+	@echo 'If this test fails, it is because the git diff is non-empty after running "make codegen-all".' >&2
+	@echo 'To correct this, locally run "make codegen-all" and commit the changes.' >&2
+	@git diff --exit-code .
 
 #########
 # UTILS #
