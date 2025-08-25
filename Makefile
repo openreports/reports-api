@@ -127,6 +127,7 @@ codegen-api-docs: $(PACKAGE_SHIM) $(GEN_CRD_API_REFERENCE_DOCS) $(GENREF) ## Gen
 
 .PHONY: codegen-manifest-release
 codegen-manifest-release: ## Create CRD release manifest
+codegen-manifest-release: $(HELM)
 codegen-manifest-release: manifests
 	@echo Generating manifests for release... >&2
 	@mkdir -p ./.manifest
