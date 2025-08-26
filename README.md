@@ -14,19 +14,41 @@ Each `Report` contains a set of `results` and a `summary`. Each `result` contain
 
 * [API Reference](./docs/api-docs.md)
 
+## Installing 
+
+Typically the Report API is installed and managed by a [producer](#producers). However, if you want to install it independently, there are multiple ways to do so:
+
+### Manifest
+
+```sh
+kubectl apply -f https://github.com/openreports/reports-api/releases/download/<version>/install.yaml
+```
+
+### Helm
+
+```sh
+# Using OCI
+helm install oci://ghcr.io/openreports/charts/openreports:<version>
+
+# Using the github repository
+helm repo add openreports https://openreports.github.io/reports-api
+helm install openreports/openreports
+```
+
 ## Demonstration
 
-Typically the Report API is installed and managed by a [producer](#producers). However, to try out the API in a test cluster you can follow the steps below:
+To try out the Report API in your cluster, you can follow the steps bellow:
 
 1. Add Report API CRDs to your cluster:
 
 ```sh
-kubectl create -f crd/openreports.io/v1alpha1/
+kubectl apply -f https://github.com/openreports/reports-api/releases/download/v0.1.0/install.yaml
+
 ```
 2. Create a sample policy report resource:
 
 ```sh
-kubectl create -f samples/sample-cis-k8s.yaml
+kubectl create -f https://raw.githubusercontent.com/openreports/reports-api/refs/heads/main/samples/sample-cis-k8s.yaml
 ```
 3. View policy report resources:
 
