@@ -8,8 +8,6 @@
 
 Package v1alpha1 contains API Schema definitions for the policy v1alpha1 API group
 
-Package v1alpha1 contains API Schema definitions for the policy v1alpha1 API group
-
 ### Resource Types
 - [ClusterReport](#clusterreport)
 - [ClusterReportList](#clusterreportlist)
