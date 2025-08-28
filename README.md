@@ -84,7 +84,7 @@ The following is a list of projects that produce or consume policy reports:
 ## Building 
 
 ```sh
-make all
+make build
 ```
 
 ## Community, discussion, contribution, and support
