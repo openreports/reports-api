@@ -5,7 +5,6 @@ updates:
       - /
     schedule:
       interval: daily
-    rebase-strategy: disabled
     groups:
       kubernetes:
         patterns:
@@ -16,4 +15,3 @@ updates:
       - /.github/actions/*/
     schedule:
       interval: daily
-    rebase-strategy: disabled
