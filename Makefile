@@ -55,7 +55,7 @@ clean-tools: ## Remove installed tools
 
 all: code-generator manifests generate generate-api-docs generate-client build fmt vet
 
-generate-all: code-generator manifests generate generate-api-docs generate-client
+generate-all: code-generator manifests generate generate-api-docs generate-client copy-crd-to-helm
 
 .PHONY: manifests
 manifests: ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
@@ -136,7 +136,7 @@ codegen-manifest-release: manifests
 
 .PHONY: verify-codegen
 verify-codegen: ## Verify all generated code are up to date
-verify-codegen: generate-all
+verify-codegen: generate-all copy-crd-to-helm
 	@echo Checking git diff... >&2
 	@echo 'If this test fails, it is because the git diff is non-empty after running "make codegen-all".' >&2
 	@echo 'To correct this, locally run "make codegen-all" and commit the changes.' >&2
