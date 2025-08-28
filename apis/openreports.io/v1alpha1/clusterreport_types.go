@@ -82,7 +82,3 @@ type ClusterReportList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []ClusterReport `json:"items"`
 }
-
-func init() {
-	objectTypes = append(objectTypes, &ClusterReport{}, &ClusterReportList{})
-}
