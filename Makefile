@@ -16,8 +16,12 @@ HELM                               ?= $(LOCALBIN)/helm
 HELM_VERSION                       ?= v3.17.3
 GOIMPORTS                          ?= $(LOCALBIN)/goimports
 GOIMPORTS_VERSION                  ?= latest
+CLIENT_GEN                         ?= $(LOCALBIN)/client-gen
+LISTER_GEN                         ?= $(LOCALBIN)/lister-gen
+INFORMER_GEN                       ?= $(LOCALBIN)/informer-gen
 REGISTER_GEN                       ?= $(LOCALBIN)/register-gen
-REGISTER_GEN_VERSION               := v0.33.1
+REGISTER_GEN                       ?= $(LOCALBIN)/register-gen
+CODE_GEN_VERSION                   := v0.33.1
 SED                                := $(shell if [ "$(GOOS)" = "darwin" ]; then echo "gsed"; else echo "sed"; fi)
 
 $(HELM):
@@ -36,8 +40,21 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 	test -s $(LOCALBIN)/controller-gen && $(LOCALBIN)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
 	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
 
+$(CLIENT_GEN):
+	@echo Install client-gen... >&2
+	@GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/client-gen@$(CODE_GEN_VERSION)
+
+$(LISTER_GEN):
+	@echo Install lister-gen... >&2
+	@GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/lister-gen@$(CODE_GEN_VERSION)
+
+$(INFORMER_GEN):
+	@echo Install informer-gen... >&2
+	@GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/informer-gen@$(CODE_GEN_VERSION)
+
 $(REGISTER_GEN):
-	@GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/register-gen@$(REGISTER_GEN_VERSION)
+	@echo Install register-gen... >&2
+	@GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/register-gen@$(CODE_GEN_VERSION)
 
 .PHONY: install-tools
 install-tools: ## Install tools
@@ -71,10 +88,56 @@ codegen-rbac: $(CONTROLLER_GEN)
 	@echo Generate rbac... >&2
 	@$(CONTROLLER_GEN) paths=./apis/... rbac:roleName=manager-role
 
-.PHONY: codegen-api-docs
+codegen-applyconfigurations: ## Generate apply configs
+codegen-applyconfigurations: $(CONTROLLER_GEN)
+	@echo Generate apply configs... >&2
+	@$(CONTROLLER_GEN) paths=./apis/... output:dir=pkg applyconfiguration
+
+.PHONY: codegen-client-clientset
+codegen-client-clientset: ## Generate clientset
+codegen-client-clientset: $(CLIENT_GEN)
+	@echo Generate clientset... >&2
+	@rm -rf ./pkg/client/clientset && mkdir -p ./pkg/client/clientset
+	@$(CLIENT_GEN) \
+		--go-header-file ./hack/boilerplate.go.txt \
+		--clientset-name versioned \
+		--apply-configuration-package github.com/openreports/reports-api/pkg/client/applyconfiguration \
+		--output-dir ./pkg/client/clientset \
+		--output-pkg github.com/openreports/reports-api/pkg/client/clientset \
+		--input-base github.com/openreports/reports-api \
+		--input ./apis/openreports.io/v1alpha1
+
+.PHONY: codegen-client-listers
+codegen-client-listers: ## Generate listers
+codegen-client-listers: $(LISTER_GEN)
+	@echo Generate listers... >&2
+	@rm -rf ./pkg/client/listers && mkdir -p ./pkg/client/listers
+	@$(LISTER_GEN) \
+		--go-header-file ./hack/boilerplate.go.txt \
+		--output-dir ./pkg/client/listers \
+		--output-pkg github.com/openreports/reports-api/pkg/client/listers \
+		./apis/...
+
+.PHONY: codegen-client-informers
+codegen-client-informers: ## Generate informers
+codegen-client-informers: $(INFORMER_GEN)
+	@echo Generate informers... >&2
+	@rm -rf ./pkg/client/informers && mkdir -p ./pkg/client/informers
+	@$(INFORMER_GEN) \
+		--go-header-file ./hack/boilerplate.go.txt \
+		--output-dir ./pkg/client/informers \
+		--output-pkg github.com/openreports/reports-api/pkg/client/informers \
+		--versioned-clientset-package github.com/openreports/reports-api/pkg/client/clientset/versioned \
+		--listers-package github.com/openreports/reports-api/pkg/client/listers \
+		./apis/...
+
+codegen-client: ## Generate client
+codegen-client: codegen-client-informers
+codegen-client: codegen-client-listers
+codegen-client: codegen-client-clientset
+
 codegen-api-docs: ## Generate API docs
 codegen-api-docs: $(GEN_CRD_API_REFERENCE_DOCS)
-codegen-api-docs: $(GENREF)
 	@echo Generate api docs... >&2
 	$(GEN_CRD_API_REFERENCE_DOCS) --source-path=./apis --config=./docs/config.yaml --renderer=markdown --output-path=./docs/api-docs.md
 
@@ -83,6 +146,7 @@ codegen: codegen-crds
 codegen: codegen-deepcopy
 codegen: codegen-rbac
 codegen: codegen-api-docs
+codegen: codegen-client
 
 #########
 # BUILD #
@@ -95,6 +159,7 @@ fmt: codegen
 
 imports: ## Run go imports against code
 imports: $(GOIMPORTS)
+imports: codegen
 	@echo Go imports... >&2
 	@$(GOIMPORTS) -w .
 
@@ -108,11 +173,6 @@ build: ## Run go build against code
 build: vet
 	@echo Build code... >&2
 	@go build ./...
-
-
-.PHONY: generate-client
-generate-client:
-	./hack/update-codegen.sh
 
 .PHONY: fmt-check
 fmt-check:
@@ -130,14 +190,6 @@ imports-check: imports
 	@echo 'If this test fails, it is because the git diff is non-empty after running "make imports-check".' >&2
 	@echo 'To correct this, locally run "make imports" and commit the changes.' >&2
 	@git diff --quiet --exit-code .
-
-.PHONY: code-generator
-code-generator:
-	@GOBIN=$(PROJECT_DIR)/bin GO111MODULE=on go install k8s.io/code-generator/cmd/client-gen@$(CODEGEN_VERSION)
-	cp -f $(CODEGEN_ROOT)/generate-groups.sh $(PROJECT_DIR)/bin/
-	cp -f $(CODEGEN_ROOT)/generate-internal-groups.sh $(PROJECT_DIR)/bin/
-	cp -f $(CODEGEN_ROOT)/kube_codegen.sh $(PROJECT_DIR)/bin/
-
 
 .PHONY: codegen-manifest-release
 codegen-manifest-release: ## Create CRD release manifest
