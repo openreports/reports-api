@@ -1,3 +1,7 @@
+############
+# DEFAULTS #
+############
+
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 
 #########
@@ -14,8 +18,6 @@ GEN_CRD_API_REFERENCE_DOCS         ?= $(LOCALBIN)/crd-ref-docs
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= latest
 HELM                               ?= $(LOCALBIN)/helm
 HELM_VERSION                       ?= v3.17.3
-GOIMPORTS                          ?= $(LOCALBIN)/goimports
-GOIMPORTS_VERSION                  ?= latest
 CLIENT_GEN                         ?= $(LOCALBIN)/client-gen
 LISTER_GEN                         ?= $(LOCALBIN)/lister-gen
 INFORMER_GEN                       ?= $(LOCALBIN)/informer-gen
@@ -27,10 +29,6 @@ SED                                := $(shell if [ "$(GOOS)" = "darwin" ]; then 
 $(HELM):
 	@echo Install helm... >&2
 	@GOBIN=$(LOCALBIN) go install helm.sh/helm/v3/cmd/helm@$(HELM_VERSION)
-
-$(GOIMPORTS):
-	@echo Install goimports... >&2
-	@GOBIN=$(LOCALBIN) go install golang.org/x/tools/cmd/goimports@$(GOIMPORTS_VERSION)
 
 $(GEN_CRD_API_REFERENCE_DOCS):
 	test -s $(LOCALBIN)/crd-ref-docs && $(LOCALBIN)/crd-ref-docs --version | grep -q $(GEN_CRD_API_REFERENCE_DOCS_VERSION) || \
@@ -61,7 +59,6 @@ install-tools: ## Install tools
 install-tools: $(HELM)
 install-tools: $(GEN_CRD_API_REFERENCE_DOCS)
 install-tools: $(CONTROLLER_GEN)
-install-tools: $(GOIMPORTS)
 install-tools: $(REGISTER_GEN)
 
 .PHONY: clean-tools
@@ -137,7 +134,12 @@ codegen-client: codegen-client-clientset
 codegen-api-docs: ## Generate API docs
 codegen-api-docs: $(GEN_CRD_API_REFERENCE_DOCS)
 	@echo Generate api docs... >&2
-	$(GEN_CRD_API_REFERENCE_DOCS) --source-path=./apis --config=./docs/config.yaml --renderer=markdown --output-path=./docs/api-docs.md
+	@$(GEN_CRD_API_REFERENCE_DOCS) --source-path=./apis --config=./docs/config.yaml --renderer=markdown --output-path=./docs/api-docs.md
+
+codegen-helm-crds: ## Copy CRDs in helm chart
+codegen-helm-crds: codegen-crds
+	@echo Copy CRDs... >&2
+	@cp config/crd/*.yaml chart/templates/
 
 codegen: ## Build all generated code
 codegen: codegen-crds
@@ -145,6 +147,17 @@ codegen: codegen-deepcopy
 codegen: codegen-rbac
 codegen: codegen-api-docs
 codegen: codegen-client
+codegen: codegen-helm-crds
+
+verify-codegen: ## Verify all generated code and docs are up to date
+verify-codegen: codegen
+	@echo Run go mod tidy... >&2
+	@go mod tidy
+	@echo Checking codegen is up to date... >&2
+	@git --no-pager diff -- .
+	@echo 'If this test fails, it is because the git diff is non-empty after running "make codegen".' >&2
+	@echo 'To correct this, locally run "make codegen", commit the changes, and re-run tests.' >&2
+	@git diff --quiet --exit-code -- .
 
 #########
 # BUILD #
@@ -155,46 +168,15 @@ fmt: codegen
 	@echo Format code... >&2
 	@go fmt ./...
 
-imports: ## Run go imports against code
-imports: $(GOIMPORTS)
-imports: codegen
-	@echo Go imports... >&2
-	@$(GOIMPORTS) -w .
-
 vet: ## Run go vet against code
 vet: fmt
-vet: imports
 	@echo Vet code... >&2
-	go vet ./...
+	@go vet ./...
 
 build: ## Run go build against code
 build: vet
 	@echo Build code... >&2
 	@go build ./...
-
-.PHONY: unused-package-check
-unused-package-check:
-	@tidy=$$(go mod tidy); \
-	if [ -n "$${tidy}" ]; then \
-		echo "go mod tidy checking failed!"; echo "$${tidy}"; echo; \
-	fi
-
-.PHONY: fmt-check
-fmt-check:
-	@echo "Checking go fmt..." >&2
-	@git --no-pager diff .
-	@echo 'If this test fails, it is because the git diff is non-empty after running "make fmt".' >&2
-	@echo 'To correct this, locally run "make fmt" and commit the changes.' >&2
-	@git diff --quiet --exit-code .
-
-
-.PHONY: imports-check
-imports-check: imports
-	@echo Checking go imports... >&2
-	@git --no-pager diff .
-	@echo 'If this test fails, it is because the git diff is non-empty after running "make imports-check".' >&2
-	@echo 'To correct this, locally run "make imports" and commit the changes.' >&2
-	@git diff --quiet --exit-code .
 
 .PHONY: codegen-manifest-release
 codegen-manifest-release: ## Create CRD release manifest
@@ -203,19 +185,7 @@ codegen-manifest-release: manifests
 	@echo Generating manifests for release... >&2
 	@mkdir -p ./.manifest
 	@$(HELM) template openreports chart/ \
-	| $(SED) -e '/^#.*/d' > ./.manifest/release.yaml
-
-.PHONY: verify-codegen
-verify-codegen: ## Verify all generated code are up to date
-verify-codegen: generate-all copy-crd-to-helm
-	@echo Checking git diff... >&2
-	@echo 'If this test fails, it is because the git diff is non-empty after running "make codegen-all".' >&2
-	@echo 'To correct this, locally run "make codegen-all" and commit the changes.' >&2
-	@git diff --exit-code .
-
-.PHONY: copy-crd-to-helm
-copy-crd-to-helm: manifests ## Generate CRD YAMLs and copy them to the Helm chart templates directory
-	cp config/crd/openreports.io/v1alpha1/*.yaml chart/templates/
+		| $(SED) -e '/^#.*/d' > ./.manifest/release.yaml
 
 ########
 # HELP #
