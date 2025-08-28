@@ -9,14 +9,14 @@ else
 GOBIN=$(shell go env GOBIN)
 endif
 
-## Location to install dependencies to
-LOCALBIN ?= $(shell pwd)/bin
-$(LOCALBIN):
-	mkdir -p $(LOCALBIN)
+###########
+## TOOLS ##
+###########
 
-CODEGEN_VERSION := v0.30.0-rc.2
-CODEGEN = $(shell pwd)/bin/code-generator
-CODEGEN_ROOT = $(shell $(GO_CMD) env GOMODCACHE)/k8s.io/code-generator@$(CODEGEN_VERSION)
+LOCALBIN                           := $(PWD)/bin
+CODEGEN_VERSION                    := v0.30.0-rc.2
+CODEGEN                             = $(shell pwd)/bin/code-generator
+CODEGEN_ROOT                        = $(shell $(GO_CMD) env GOMODCACHE)/k8s.io/code-generator@$(CODEGEN_VERSION)
 CONTROLLER_TOOLS_VERSION           ?= v0.18.0
 CONTROLLER_GEN                     ?= $(LOCALBIN)/controller-gen
 GEN_CRD_API_REFERENCE_DOCS         ?= $(LOCALBIN)/crd-ref-docs
@@ -25,8 +25,9 @@ HELM                               ?= $(LOCALBIN)/helm
 HELM_VERSION                       ?= v3.17.3
 GOIMPORTS                          ?= $(LOCALBIN)/goimports
 GOIMPORTS_VERSION                  ?= latest
-TOOLS := $(HELM)
-SED     := $(shell if [ "$(GOOS)" = "darwin" ]; then echo "gsed"; else echo "sed"; fi)
+REGISTER_GEN                       ?= $(LOCALBIN)/register-gen
+REGISTER_GEN_VERSION               := v0.33.1
+SED                                := $(shell if [ "$(GOOS)" = "darwin" ]; then echo "gsed"; else echo "sed"; fi)
 
 $(HELM):
 	@echo Install helm... >&2
@@ -44,9 +45,12 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 	test -s $(LOCALBIN)/controller-gen && $(LOCALBIN)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
 	GOBIN=$(LOCALBIN) $(GO_CMD) install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
 
+$(REGISTER_GEN):
+	@GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/register-gen@$(REGISTER_GEN_VERSION)
+
 .PHONY: install-tools
 install-tools: ## Install tools
-install-tools: $(TOOLS) $(GEN_CRD_API_REFERENCE_DOCS) $(CONTROLLER_GEN) $(GOIMPORTS)
+install-tools: $(HELM) $(GEN_CRD_API_REFERENCE_DOCS) $(CONTROLLER_GEN) $(GOIMPORTS)
 
 .PHONY: clean-tools
 clean-tools: ## Remove installed tools
@@ -64,13 +68,14 @@ manifests: $(CONTROLLER_GEN)
 
 .PHONY: generate
 generate: ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
-generate: $(CONTROLLER_GEN) 
-	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./apis/..."
+generate: $(CONTROLLER_GEN)
+generate: $(REGISTER_GEN)
+	$(CONTROLLER_GEN) object:headerFile=hack/boilerplate.go.txt paths="./apis/..."
+	$(REGISTER_GEN) --go-header-file=hack/boilerplate.go.txt --output-file zz_generated.register.go ./apis/...
 
 .PHONY: generate-client
 generate-client:
 	./hack/update-codegen.sh
-
 
 # Run go build against code
 build:
