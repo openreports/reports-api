@@ -95,7 +95,6 @@ codegen-client-clientset: $(CLIENT_GEN)
 	@echo Generate clientset... >&2
 	@rm -rf ./pkg/client/clientset && mkdir -p ./pkg/client/clientset
 	@$(CLIENT_GEN) \
-		--go-header-file ./hack/boilerplate.go.txt \
 		--clientset-name versioned \
 		--apply-configuration-package github.com/openreports/reports-api/pkg/client/applyconfiguration \
 		--output-dir ./pkg/client/clientset \
@@ -108,7 +107,6 @@ codegen-client-listers: $(LISTER_GEN)
 	@echo Generate listers... >&2
 	@rm -rf ./pkg/client/listers && mkdir -p ./pkg/client/listers
 	@$(LISTER_GEN) \
-		--go-header-file ./hack/boilerplate.go.txt \
 		--output-dir ./pkg/client/listers \
 		--output-pkg github.com/openreports/reports-api/pkg/client/listers \
 		./apis/...
@@ -118,7 +116,6 @@ codegen-client-informers: $(INFORMER_GEN)
 	@echo Generate informers... >&2
 	@rm -rf ./pkg/client/informers && mkdir -p ./pkg/client/informers
 	@$(INFORMER_GEN) \
-		--go-header-file ./hack/boilerplate.go.txt \
 		--output-dir ./pkg/client/informers \
 		--output-pkg github.com/openreports/reports-api/pkg/client/informers \
 		--versioned-clientset-package github.com/openreports/reports-api/pkg/client/clientset/versioned \
