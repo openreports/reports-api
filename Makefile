@@ -172,6 +172,13 @@ build: vet
 	@echo Build code... >&2
 	@go build ./...
 
+.PHONY: unused-package-check
+unused-package-check:
+	@tidy=$$(go mod tidy); \
+	if [ -n "$${tidy}" ]; then \
+		echo "go mod tidy checking failed!"; echo "$${tidy}"; echo; \
+	fi
+
 .PHONY: fmt-check
 fmt-check:
 	@echo "Checking go fmt..." >&2
@@ -208,14 +215,7 @@ verify-codegen: generate-all copy-crd-to-helm
 
 .PHONY: copy-crd-to-helm
 copy-crd-to-helm: manifests ## Generate CRD YAMLs and copy them to the Helm chart templates directory
-	cp crd/openreports.io/v1alpha1/*.yaml chart/templates/
-
-.PHONY: unused-package-check
-unused-package-check:
-	@tidy=$$(go mod tidy); \
-	if [ -n "$${tidy}" ]; then \
-		echo "go mod tidy checking failed!"; echo "$${tidy}"; echo; \
-	fi
+	cp config/crd/openreports.io/v1alpha1/*.yaml chart/templates/
 
 ########
 # HELP #
