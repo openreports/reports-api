@@ -141,6 +141,14 @@ codegen-helm-crds: codegen-crds
 	@echo Copy CRDs... >&2
 	@cp config/crd/*.yaml chart/templates/
 
+codegen-release-manifest: ## Generate release manifest
+codegen-release-manifest: $(HELM)
+codegen-release-manifest: codegen-helm-crds
+	@echo Generate release manifests... >&2
+	@rm -rf ./.manifest && mkdir -p ./.manifest
+	@$(HELM) template openreports chart/ \
+		| $(SED) -e '/^#.*/d' > ./.manifest/release.yaml
+
 codegen: ## Build all generated code
 codegen: codegen-crds
 codegen: codegen-deepcopy
@@ -148,6 +156,7 @@ codegen: codegen-rbac
 codegen: codegen-api-docs
 codegen: codegen-client
 codegen: codegen-helm-crds
+codegen: codegen-release-manifest
 
 verify-codegen: ## Verify all generated code and docs are up to date
 verify-codegen: codegen
@@ -177,15 +186,6 @@ build: ## Run go build against code
 build: vet
 	@echo Build code... >&2
 	@go build ./...
-
-.PHONY: codegen-manifest-release
-codegen-manifest-release: ## Create CRD release manifest
-codegen-manifest-release: $(HELM)
-codegen-manifest-release: manifests
-	@echo Generating manifests for release... >&2
-	@mkdir -p ./.manifest
-	@$(HELM) template openreports chart/ \
-		| $(SED) -e '/^#.*/d' > ./.manifest/release.yaml
 
 ########
 # HELP #
