@@ -32,11 +32,11 @@ $(GOIMPORTS):
 	@echo Install goimports... >&2
 	@GOBIN=$(LOCALBIN) go install golang.org/x/tools/cmd/goimports@$(GOIMPORTS_VERSION)
 
-$(GEN_CRD_API_REFERENCE_DOCS): $(LOCALBIN)
+$(GEN_CRD_API_REFERENCE_DOCS):
 	test -s $(LOCALBIN)/crd-ref-docs && $(LOCALBIN)/crd-ref-docs --version | grep -q $(GEN_CRD_API_REFERENCE_DOCS_VERSION) || \
 	GOBIN=$(LOCALBIN) go install github.com/elastic/crd-ref-docs@$(GEN_CRD_API_REFERENCE_DOCS_VERSION)
 
-$(CONTROLLER_GEN): $(LOCALBIN)
+$(CONTROLLER_GEN):
 	test -s $(LOCALBIN)/controller-gen && $(LOCALBIN)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
 	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
 
@@ -88,12 +88,11 @@ codegen-rbac: $(CONTROLLER_GEN)
 	@echo Generate rbac... >&2
 	@$(CONTROLLER_GEN) paths=./apis/... rbac:roleName=manager-role
 
-codegen-applyconfigurations: ## Generate apply configs
-codegen-applyconfigurations: $(CONTROLLER_GEN)
+codegen-client-applyconfigurations: ## Generate apply configs
+codegen-client-applyconfigurations: $(CONTROLLER_GEN)
 	@echo Generate apply configs... >&2
-	@$(CONTROLLER_GEN) paths=./apis/... output:dir=pkg applyconfiguration
+	@$(CONTROLLER_GEN) paths=./apis/... applyconfiguration
 
-.PHONY: codegen-client-clientset
 codegen-client-clientset: ## Generate clientset
 codegen-client-clientset: $(CLIENT_GEN)
 	@echo Generate clientset... >&2
@@ -107,7 +106,6 @@ codegen-client-clientset: $(CLIENT_GEN)
 		--input-base github.com/openreports/reports-api \
 		--input ./apis/openreports.io/v1alpha1
 
-.PHONY: codegen-client-listers
 codegen-client-listers: ## Generate listers
 codegen-client-listers: $(LISTER_GEN)
 	@echo Generate listers... >&2
@@ -118,7 +116,6 @@ codegen-client-listers: $(LISTER_GEN)
 		--output-pkg github.com/openreports/reports-api/pkg/client/listers \
 		./apis/...
 
-.PHONY: codegen-client-informers
 codegen-client-informers: ## Generate informers
 codegen-client-informers: $(INFORMER_GEN)
 	@echo Generate informers... >&2
@@ -132,6 +129,7 @@ codegen-client-informers: $(INFORMER_GEN)
 		./apis/...
 
 codegen-client: ## Generate client
+codegen-client: codegen-client-applyconfigurations
 codegen-client: codegen-client-informers
 codegen-client: codegen-client-listers
 codegen-client: codegen-client-clientset
