@@ -3,10 +3,10 @@ module github.com/openreports/reports-api
 go 1.24.0
 
 require (
-	k8s.io/api v0.33.2
-	k8s.io/apimachinery v0.33.2
-	k8s.io/client-go v0.33.2
-	k8s.io/code-generator v0.33.2
+	k8s.io/api v0.33.4
+	k8s.io/apimachinery v0.33.4
+	k8s.io/client-go v0.33.4
+	k8s.io/code-generator v0.33.4
 	sigs.k8s.io/structured-merge-diff/v4 v4.7.0
 )
 
