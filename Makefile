@@ -18,6 +18,8 @@ GEN_CRD_API_REFERENCE_DOCS         ?= $(LOCALBIN)/crd-ref-docs
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= latest
 HELM                               ?= $(LOCALBIN)/helm
 HELM_VERSION                       ?= v3.17.3
+HELM_DOCS                          ?= $(TOOLS_DIR)/helm-docs
+HELM_DOCS_VERSION                  ?= v1.14.2
 CLIENT_GEN                         ?= $(LOCALBIN)/client-gen
 LISTER_GEN                         ?= $(LOCALBIN)/lister-gen
 INFORMER_GEN                       ?= $(LOCALBIN)/informer-gen
@@ -29,6 +31,10 @@ SED                                := $(shell if [ "$(GOOS)" = "darwin" ]; then 
 $(HELM):
 	@echo Install helm... >&2
 	@GOBIN=$(LOCALBIN) go install helm.sh/helm/v3/cmd/helm@$(HELM_VERSION)
+
+$(HELM_DOCS):
+	@echo Install helm-docs... >&2
+	@GOBIN=$(LOCALBIN) go install github.com/norwoodj/helm-docs/cmd/helm-docs@$(HELM_DOCS_VERSION)
 
 $(GEN_CRD_API_REFERENCE_DOCS):
 	test -s $(LOCALBIN)/crd-ref-docs && $(LOCALBIN)/crd-ref-docs --version | grep -q $(GEN_CRD_API_REFERENCE_DOCS_VERSION) || \
@@ -138,6 +144,11 @@ codegen-helm-crds: codegen-crds
 	@echo Copy CRDs... >&2
 	@cp config/crd/*.yaml chart/templates/
 
+.PHONY: codegen-helm-docs
+codegen-helm-docs: ## Generate helm docs
+	@echo Generate helm docs... >&2
+	@docker run -v ${PWD}/chart:/work -w /work jnorwood/helm-docs:$(HELM_DOCS_VERSION) -s file
+
 codegen-release-manifest: ## Generate release manifest
 codegen-release-manifest: $(HELM)
 codegen-release-manifest: codegen-helm-crds
@@ -154,6 +165,7 @@ codegen: codegen-api-docs
 codegen: codegen-client
 codegen: codegen-helm-crds
 codegen: codegen-release-manifest
+codegen: codegen-helm-docs
 
 verify-codegen: ## Verify all generated code and docs are up to date
 verify-codegen: codegen
