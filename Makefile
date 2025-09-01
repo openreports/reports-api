@@ -165,6 +165,7 @@ codegen: codegen-api-docs
 codegen: codegen-client
 codegen: codegen-helm-crds
 codegen: codegen-release-manifest
+codegen: codegen-helm-docs
 
 verify-codegen: ## Verify all generated code and docs are up to date
 verify-codegen: codegen
