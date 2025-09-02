@@ -9,10 +9,10 @@ PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 #########
 
 LOCALBIN                           := $(PWD)/bin
-CODEGEN_VERSION                    := v0.30.0-rc.2
+CODEGEN_VERSION                    := v0.34.0
 CODEGEN                             = $(shell pwd)/bin/code-generator
 CODEGEN_ROOT                        = $(shell go env GOMODCACHE)/k8s.io/code-generator@$(CODEGEN_VERSION)
-CONTROLLER_TOOLS_VERSION           ?= v0.18.0
+CONTROLLER_TOOLS_VERSION           ?= v0.19.0
 CONTROLLER_GEN                     ?= $(LOCALBIN)/controller-gen
 GEN_CRD_API_REFERENCE_DOCS         ?= $(LOCALBIN)/crd-ref-docs
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= latest
