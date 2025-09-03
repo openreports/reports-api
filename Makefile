@@ -142,7 +142,7 @@ codegen-api-docs: $(GEN_CRD_API_REFERENCE_DOCS)
 codegen-helm-crds: ## Copy CRDs in helm chart
 codegen-helm-crds: codegen-crds
 	@echo Copy CRDs... >&2
-	@cp config/crd/*.yaml chart/templates/
+	@cp config/crd/*.yaml charts/openreports/templates/
 
 .PHONY: codegen-helm-docs
 codegen-helm-docs: ## Generate helm docs
@@ -153,7 +153,7 @@ codegen-release-manifest: ## Generate release manifest
 codegen-release-manifest: $(HELM)
 codegen-release-manifest: codegen-helm-crds
 	@echo Generate release manifests... >&2
-	@$(HELM) template openreports chart/ \
+	@$(HELM) template openreports charts/openreports \
 		| $(SED) -e '/^#.*/d' > ./config/install.yaml
 
 codegen: ## Build all generated code
