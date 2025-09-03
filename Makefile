@@ -153,9 +153,8 @@ codegen-release-manifest: ## Generate release manifest
 codegen-release-manifest: $(HELM)
 codegen-release-manifest: codegen-helm-crds
 	@echo Generate release manifests... >&2
-	@rm -rf ./.manifest && mkdir -p ./.manifest
 	@$(HELM) template openreports chart/ \
-		| $(SED) -e '/^#.*/d' > ./.manifest/release.yaml
+		| $(SED) -e '/^#.*/d' > ./config/install.yaml
 
 codegen: ## Build all generated code
 codegen: codegen-crds
