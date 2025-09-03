@@ -19,10 +19,26 @@ jobs:
       - name: Setup build env
         uses: ./.github/actions/setup-build-env
         timeout-minutes: 30
-      - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0" # v1.12.1
+      
+      - name: Determine if prerelease
+        id: prerelease
+        run: |
+          VERSION="${{ github.ref_name }}"
+          # Remove 'v' prefix if present
+          VERSION=${VERSION#v}
+          # Check if version contains prerelease identifiers (alpha, beta, rc, etc.)
+          if [[ "$VERSION" =~ (alpha|beta|rc|pre|preview|dev|snapshot) ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - uses: "softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8" # v2.3.2
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          generate_release_notes: true
+          make_latest: ${{ steps.prerelease.outputs.is_prerelease != 'true' }}
+          prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
 
   lint-artifacthub:
     runs-on: ubuntu-latest
