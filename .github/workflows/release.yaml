@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: release
 
 permissions: {}
@@ -8,18 +9,13 @@ on:
       - v*
 
 jobs:
-  create-release:
+  github:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      id-token: write
+      contents: write # needed to write releases
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - name: Setup build env
-        uses: ./.github/actions/setup-build-env
-        timeout-minutes: 30
-      
       - name: Determine if prerelease
         id: prerelease
         run: |
@@ -32,50 +28,12 @@ jobs:
           else
             echo "is_prerelease=false" >> $GITHUB_OUTPUT
           fi
-      
-      - uses: "softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8" # v2.3.2
+      - uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
         with:
-          token: "${{ secrets.GITHUB_TOKEN }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
           generate_release_notes: true
           make_latest: ${{ steps.prerelease.outputs.is_prerelease != 'true' }}
           prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
-
-  lint-artifacthub:
-    runs-on: ubuntu-latest
-    container:
-      image: artifacthub/ah
-      options: --user root
-    steps:
-      - name: Checkout
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - name: Run ah lint
-        working-directory: ./chart/
-        run: ah lint
-  
-  push-and-sign-install-manifest:
-    runs-on: ubuntu-latest
-    needs: create-release
-    permissions:
-      contents: write # needed to write releases
-      id-token: write # needed for keyless signing
-      packages: write # needed for ghcr access  
-    steps:
-      - name: Checkout
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - name: Setup build env
-        uses: ./.github/actions/setup-build-env
-        timeout-minutes: 10
-      - name: Setup Flux CLI
-        uses: fluxcd/flux2/action@6bf37f6a560fd84982d67f853162e4b3c2235edb # v2.6.4
-        with:
-          version: 0.35.0
-      - name: Install Cosign
-        uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159 # v3.9.2
-      - name: Build yaml manifest
-        run: | 
-          mkdir -p ./.manifest
-          VERSION=${{ github.ref_name }} helm template openreports chart/ \
-          | sed -e '/^#.*/d' > ./.manifest/release.yaml
       - name: Upload install manifest
         uses: svenstaro/upload-release-action@81c65b7cd4de9b2570615ce3aad67a41de5b1a13 # 2.11.2
         with:
@@ -87,9 +45,24 @@ jobs:
         uses: svenstaro/upload-release-action@81c65b7cd4de9b2570615ce3aad67a41de5b1a13 # 2.11.2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: config/**/*.yaml
+          file: config/crd/**/*.yaml
           file_glob: true
           tag: ${{ github.ref }}
+
+  manifests:
+    runs-on: ubuntu-latest
+    needs:
+      - github
+    permissions:
+      id-token: write # needed for keyless signing
+      packages: write # needed for ghcr access
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159 # v3.9.2
+      - name: Install Flux CLI
+        uses: fluxcd/flux2/action@6bf37f6a560fd84982d67f853162e4b3c2235edb # v2.6.4
       - name: Login to GHCR
         uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
         with:
@@ -101,68 +74,49 @@ jobs:
           CR_PAT_ARTIFACTS:  ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
-          mkdir -p config/.release-manifests
-          cp .manifest/release.yaml config/.release-manifests/install.yaml
           cd config/.release-manifests/ && \
           flux push artifact oci://ghcr.io/${{ github.repository_owner }}/manifests/openreports:${{ github.ref_name }} \
-            --path="." \
-            --source="$(git config --get remote.origin.url)" \
-            --revision="${{ github.ref_name }}/$(git rev-parse HEAD)"
+            --path=config/install.yaml \
+            --source=$(git config --get remote.origin.url) \
+            --revision=${{ github.ref_name }}/$(git rev-parse HEAD)
       - name: Sign manifests in GHCR with Cosign
         run: |
           cosign sign --yes ghcr.io/${{ github.repository_owner }}/manifests/openreports:${{ github.ref_name }}
 
-  push-and-sign-helm-release:
+  helm:
     runs-on: ubuntu-latest
-    needs: create-release
+    needs:
+      - github
     permissions:
-      contents: write
-      packages: write
-      id-token: write
-      pages: write
+      id-token: write # needed for keyless signing
+      packages: write # needed for ghcr access
+      pages: write # needed for pages access
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - name: Setup-build-env
-        uses: ./.github/actions/setup-build-env
-        timeout-minutes: 10
       - name: Install helm
         uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4.3.1
-        with:
-          version: v3.10.3
-        
       - name: Install Cosign
         uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159 # v3.9.2
-      
       - name: Set version
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      
       - name: Set semver version
         run: echo "RELEASE_SEMVER_VERSION=${RELEASE_VERSION#openreports-}" >> $GITHUB_ENV
         env:
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-
-      - name: Create charts tmp directory
-        run: |
-          mkdir -p charts-tmp
-          cp -r chart charts-tmp/openreports
-      
       - name: Run chart-releaser
         uses: stefanprodan/helm-gh-pages@0ad2bb377311d61ac04ad9eb6f252fb68e207260 #v1.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           linting: off
-          charts_dir: charts-tmp
+          charts_dir: charts
           chart_version: ${{ env.RELEASE_SEMVER_VERSION }}
-      
       - name: Login to GitHub container registry
         run: |
-          helm registry login ghcr.io -u ${GITHUB_ACTOR} -p ${{ secrets.GITHUB_TOKEN }}
-      
+          helm registry login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
       - name: Publish OCI Chart
         run: |
-          helm package charts-tmp/openreports --version ${{ env.RELEASE_SEMVER_VERSION }} --destination .dist/
+          helm package charts/openreports --version ${{ env.RELEASE_SEMVER_VERSION }} --destination .dist/
           helm push .dist/openreports-*.tgz oci://ghcr.io/${{ github.repository_owner }}/charts |& tee .digest
-          cosign login --username ${GITHUB_ACTOR} --password ${{ secrets.GITHUB_TOKEN }} ghcr.io
+          cosign login --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} ghcr.io
           cosign sign --yes ghcr.io/${{ github.repository_owner }}/charts/openreports@$(cat .digest | awk -F "[, ]" '/Digest/{print $NF}')
-

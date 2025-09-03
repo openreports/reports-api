@@ -33,6 +33,18 @@ jobs:
         with:
           skip-cache: true
 
+  ah-lint:
+    runs-on: ubuntu-latest
+    container:
+      image: artifacthub/ah
+      options: --user root
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Run ah lint
+        working-directory: charts
+        run: ah lint
+
   verify-codegen:
     runs-on: ubuntu-latest
     steps:
