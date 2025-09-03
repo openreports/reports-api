@@ -16,7 +16,7 @@ Each `Report` contains a set of `results` and a `summary`. Each `result` contain
 
 ## Installing 
 
-Typically the Report API is installed and managed by a [producer](#producers). However, if you want to install it independently, there are multiple ways to do so:
+Typically the Report API is installed and managed by a [producer](#report-producers). However, if you want to install it independently, there are multiple ways to do so:
 
 ### Manifest
 
@@ -24,15 +24,26 @@ Typically the Report API is installed and managed by a [producer](#producers). H
 kubectl apply -f https://github.com/openreports/reports-api/releases/download/<version>/install.yaml
 ```
 
-### Helm
+Or install the latest dev manifests from the `main` branch:
 
 ```sh
-# Using OCI
-helm install oci://ghcr.io/openreports/charts/openreports:<version>
+kubectl apply -f https://raw.githubusercontent.com/openreports/reports-api/refs/heads/main/config/install.yaml
+```
 
-# Using the github repository
-helm repo add openreports https://openreports.github.io/reports-api
-helm install openreports/openreports
+### Helm
+
+Using OCI:
+
+```sh
+helm install oci://ghcr.io/openreports/charts/openreports:<version>
+```
+
+Using the repository:
+
+```sh
+helm upgrade --install openreports \
+     --repo https://openreports.github.io/reports-api \
+     openreports
 ```
 
 ## Demonstration
@@ -43,17 +54,21 @@ To try out the Report API in your cluster, you can follow the steps bellow:
 
 ```sh
 kubectl apply -f https://github.com/openreports/reports-api/releases/download/v0.1.0/install.yaml
-
 ```
+
 2. Create a sample policy report resource:
 
 ```sh
 kubectl create -f https://raw.githubusercontent.com/openreports/reports-api/refs/heads/main/samples/sample-cis-k8s.yaml
 ```
+
 3. View policy report resources:
 
 ```sh
 kubectl get reports
+
+NAME                          PASS   FAIL   WARN   ERROR   SKIP   AGE
+sample-cis-bench-api-server   8      2      0      0       0      4s
 ```
 
 ## Implementations
