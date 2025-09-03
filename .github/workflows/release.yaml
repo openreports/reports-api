@@ -16,38 +16,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - name: Determine if prerelease
-        id: prerelease
-        run: |
-          VERSION="${{ github.ref_name }}"
-          # Remove 'v' prefix if present
-          VERSION=${VERSION#v}
-          # Check if version contains prerelease identifiers (alpha, beta, rc, etc.)
-          if [[ "$VERSION" =~ (alpha|beta|rc|pre|preview|dev|snapshot) ]]; then
-            echo "is_prerelease=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_prerelease=false" >> $GITHUB_OUTPUT
-          fi
+      - name: Parse version
+        id: version
+        uses: booxmedialtd/ws-action-parse-semver@7784200024d6b3fc01253e617ec0168daf603de3 # v1.4.7
+        with:
+          input_string: ${{ github.ref_name }}
+          version_extractor_regex: ^v(.*)$
       - uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           generate_release_notes: true
-          make_latest: ${{ steps.prerelease.outputs.is_prerelease != 'true' }}
-          prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
-      - name: Upload install manifest
-        uses: svenstaro/upload-release-action@81c65b7cd4de9b2570615ce3aad67a41de5b1a13 # 2.11.2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: .manifest/release.yaml
-          asset_name: install.yaml
-          tag: ${{ github.ref }}
-      - name: Upload CRD manifest
-        uses: svenstaro/upload-release-action@81c65b7cd4de9b2570615ce3aad67a41de5b1a13 # 2.11.2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: config/crd/**/*.yaml
-          file_glob: true
-          tag: ${{ github.ref }}
+          make_latest: ${{ steps.version.outputs.prerelease == '' }}
+          prerelease: ${{ steps.version.outputs.prerelease != '' }}
+          fail_on_unmatched_files: true
+          files: |
+            config/install.yaml
+            config/crd/openreports.io_clusterreports.yaml
+            config/crd/openreports.io_reports.yaml
 
   manifests:
     runs-on: ubuntu-latest
