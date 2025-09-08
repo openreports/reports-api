@@ -1,3 +1,9 @@
+<p align="center">
+  <picture>
+    <img align="center" alt="OpenReports Logo" src="https://raw.githubusercontent.com/openreports/website/refs/heads/main/static/images/OpenReports.png">
+  </picture>
+</p>
+
 # OpenReports API
 
 The OpenReports API enables uniform reporting of results and findings from policy engines, scanners, or other tooling.
