@@ -83,25 +83,25 @@ jobs:
         uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4.3.1
       - name: Install Cosign
         uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159 # v3.9.2
-      - name: Set version
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      - name: Set semver version
-        run: echo "RELEASE_SEMVER_VERSION=${RELEASE_VERSION#openreports-}" >> $GITHUB_ENV
-        env:
-          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+      - name: Parse version
+        id: version
+        uses: booxmedialtd/ws-action-parse-semver@7784200024d6b3fc01253e617ec0168daf603de3 # v1.4.7
+        with:
+          input_string: ${{ github.ref_name }}
+          version_extractor_regex: ^v(.*)$
       - name: Run chart-releaser
         uses: stefanprodan/helm-gh-pages@0ad2bb377311d61ac04ad9eb6f252fb68e207260 #v1.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           linting: off
           charts_dir: charts
-          chart_version: ${{ env.RELEASE_SEMVER_VERSION }}
+          chart_version: ${{ steps.version.outputs.fullversion}}
       - name: Login to GitHub container registry
         run: |
           helm registry login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
       - name: Publish OCI Chart
         run: |
-          helm package charts/openreports --version ${{ env.RELEASE_SEMVER_VERSION }} --destination .dist/
+          helm package charts/openreports --version ${{ steps.version.outputs.fullversion}} --destination .dist/
           helm push .dist/openreports-*.tgz oci://ghcr.io/${{ github.repository_owner }}/charts |& tee .digest
           cosign login --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} ghcr.io
           cosign sign --yes ghcr.io/${{ github.repository_owner }}/charts/openreports@$(cat .digest | awk -F "[, ]" '/Digest/{print $NF}')
