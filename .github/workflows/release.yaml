@@ -95,7 +95,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           linting: off
           charts_dir: charts
-          chart_version: ${{ steps.version.outputs.fullversion}}
+          chart_version: ${{ steps.version.outputs.fullversion }}
       - name: Login to GitHub container registry
         run: |
           helm registry login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
