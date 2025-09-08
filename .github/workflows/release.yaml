@@ -101,7 +101,7 @@ jobs:
           helm registry login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
       - name: Publish OCI Chart
         run: |
-          helm package charts/openreports --version ${{ steps.version.outputs.fullversion}} --destination .dist/
+          helm package charts/openreports --version ${{ steps.version.outputs.fullversion }} --destination .dist/
           helm push .dist/openreports-*.tgz oci://ghcr.io/${{ github.repository_owner }}/charts |& tee .digest
           cosign login --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} ghcr.io
           cosign sign --yes ghcr.io/${{ github.repository_owner }}/charts/openreports@$(cat .digest | awk -F "[, ]" '/Digest/{print $NF}')
