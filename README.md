@@ -1,3 +1,7 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/openreports/reports-api)](https://goreportcard.com/report/github.com/openreports/reports-api)
+[![License: Apache-2.0](https://img.shields.io/github/license/openreports/reports-api?color=blue)](https://github.com/openreports/reports-api/blob/main/LICENSE)
+[![Codecov](https://codecov.io/gh/openreports/reports-api/branch/main/graph/badge.svg)](https://app.codecov.io/gh/openreports/reports-api/branch/main)
+
 <p align="center">
   <picture>
     <img align="center" alt="OpenReports Logo" src="https://raw.githubusercontent.com/openreports/website/refs/heads/main/static/images/OpenReports.png">
