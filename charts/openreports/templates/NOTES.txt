@@ -1,0 +1,9 @@
+Reports API ({{ .Chart.Version }}) successfully installed!
+
+To learn more about the release, try:
+  $ helm status {{ .Release.Name }} -n {{ .Release.Namespace }}
+  $ helm get all {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+To view policy report resources, try:
+  $ kubectl get reports
+  $ kubectl get clusterreports
