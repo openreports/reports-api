@@ -2,7 +2,6 @@ apiVersion: v2
 name: openreports
 description: A Helm chart for installing openreports APIs.
 version: v0.0.0
-appVersion: latest
 annotations:
   artifacthub.io/home: https://github.com/openreports/openreports
   artifacthub.io/sources: https://github.com/openreports/openreports
