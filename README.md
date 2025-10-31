@@ -101,6 +101,7 @@ The following is a list of projects that produce or consume policy reports:
 * [Lula](https://github.com/defenseunicorns/lula)
 * [Nirmata Control Hub](https://nirmata.com/nirmata-control-hub/)
 * [Open Cluster Management](https://open-cluster-management.io/)
+* [SUSE Rancher](https://github.com/rancher/rancher)
 
 ## Building 
 
