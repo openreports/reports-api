@@ -41,7 +41,7 @@ kubectl apply -f https://raw.githubusercontent.com/openreports/reports-api/refs/
 Using OCI:
 
 ```sh
-helm install oci://ghcr.io/openreports/charts/openreports:<version>
+helm install openreports oci://ghcr.io/openreports/charts/openreports:<version>
 ```
 
 Using the repository:
